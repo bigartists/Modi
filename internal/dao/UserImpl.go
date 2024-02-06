@@ -1,8 +1,8 @@
 package dao
 
 import (
-	"com.github.goscaffold/internal/model/UserModel"
 	"fmt"
+	"modi/internal/model/UserModel"
 )
 
 var UserGetter IUserDao

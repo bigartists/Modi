@@ -1,4 +1,4 @@
-module com.github.goscaffold
+module modi
 
 go 1.20
 

@@ -1,10 +1,10 @@
 package main
 
 import (
-	"com.github.goscaffold/cmd/app"
-	"com.github.goscaffold/config"
-	_ "com.github.goscaffold/config"
 	"fmt"
+	"modi/cmd/app"
+	"modi/config"
+	_ "modi/config"
 )
 
 func main() {

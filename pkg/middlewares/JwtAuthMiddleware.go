@@ -1,13 +1,13 @@
 package middlewares
 
 import (
-	"com.github.goscaffold/config"
-	"com.github.goscaffold/internal/dao"
-	"com.github.goscaffold/internal/model/UserModel"
-	"com.github.goscaffold/pkg/utils"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"
+	"modi/config"
+	"modi/internal/dao"
+	"modi/internal/model/UserModel"
+	"modi/pkg/utils"
 	"net/http"
 	"strings"
 	"time"

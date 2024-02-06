@@ -1,10 +1,10 @@
 package dao
 
 import (
-	"com.github.goscaffold/config"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"log"
+	"modi/config"
 	"time"
 )
 

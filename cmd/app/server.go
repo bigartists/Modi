@@ -1,13 +1,13 @@
 package app
 
 import (
-	dbs "com.github.goscaffold/internal/dao"
-	middlewares "com.github.goscaffold/pkg/middlewares"
-	"com.github.goscaffold/pkg/validators"
-	"com.github.goscaffold/web/routes"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/cobra"
+	"modi/core/routes"
+	dbs "modi/internal/dao"
+	middlewares "modi/pkg/middlewares"
+	"modi/pkg/validators"
 )
 
 // 本函数用于初始化gin

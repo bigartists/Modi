@@ -1,10 +1,10 @@
 package service
 
 import (
-	"com.github.goscaffold/internal/dao"
-	"com.github.goscaffold/internal/model/UserModel"
-	"com.github.goscaffold/web/result"
 	"fmt"
+	"modi/core/result"
+	"modi/internal/dao"
+	"modi/internal/model/UserModel"
 )
 
 var UserServiceGetter IUser
