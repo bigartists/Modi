@@ -1,8 +1,8 @@
 package middlewares
 
 import (
-	"com.github.goscaffold/web/controllers"
 	"github.com/gin-gonic/gin"
+	"modi/core/controllers"
 )
 
 func ErrorHandler() gin.HandlerFunc {

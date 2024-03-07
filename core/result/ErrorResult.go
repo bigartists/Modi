@@ -1,8 +1,8 @@
 package result
 
 import (
-	"com.github.goscaffold/pkg/validators"
 	"fmt"
+	"modi/pkg/validators"
 )
 
 type ErrorResult struct {

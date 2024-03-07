@@ -4,3 +4,5 @@ application.yaml
 # IntelliJ IDEA files
 .idea/
 .DS_Store
+.DS_Store/
+etc/*

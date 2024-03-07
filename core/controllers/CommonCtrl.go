@@ -1,9 +1,9 @@
 package controllers
 
 import (
-	"com.github.goscaffold/pkg/globalConstants"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"modi/pkg/globalConstants"
 	"net/http"
 	"sync"
 )
@@ -85,6 +85,19 @@ func Error(c *gin.Context, v interface{}) {
 		}
 	}
 	c.JSON(400, v)
+}
+
+// 未授权
+
+func Unauthorized(c *gin.Context, v interface{}) {
+	// 将v 转成 *JSONResult 类型
+	if r, ok := v.(*JSONResult); ok {
+		r.Code = globalConstants.HTTPUNAUTHORIZED
+		if r.Message == "" {
+			r.Message = globalConstants.HTTPMESSAGEUNAUTHORIZED
+		}
+	}
+	c.JSON(401, v)
 }
 
 func OK2String(c *gin.Context, v interface{}) {

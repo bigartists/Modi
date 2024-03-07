@@ -1,6 +1,6 @@
 package dao
 
-import "com.github.goscaffold/internal/model/UserModel"
+import "modi/internal/model/UserModel"
 
 type IUserDao interface {
 	FindUserAll() []*UserModel.UserImpl

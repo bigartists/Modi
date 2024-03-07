@@ -1,8 +1,8 @@
 package service
 
 import (
-	"com.github.goscaffold/internal/model/UserModel"
-	"com.github.goscaffold/web/result"
+	"modi/core/result"
+	"modi/internal/model/UserModel"
 )
 
 type IUser interface {

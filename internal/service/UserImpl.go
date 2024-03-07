@@ -1,16 +1,20 @@
 package service
 
 import (
-	"com.github.goscaffold/internal/dao"
-	"com.github.goscaffold/internal/model/UserModel"
-	"com.github.goscaffold/web/result"
 	"fmt"
+	"modi/core/result"
+	"modi/internal/dao"
+	"modi/internal/model/UserModel"
 )
 
 var UserServiceGetter IUser
 
 func init() {
 	UserServiceGetter = NewIUserGetterImpl()
+}
+
+func NewIUserGetterImpl() *IUserServiceGetterImpl {
+	return &IUserServiceGetterImpl{}
 }
 
 type IUserServiceGetterImpl struct {
@@ -85,10 +89,6 @@ func (this *IUserServiceGetterImpl) UpdateUser(id int, user *UserModel.UserImpl)
 func (this *IUserServiceGetterImpl) DeleteUser(id int) *result.ErrorResult {
 	//TODO implement me
 	panic("implement me")
-}
-
-func NewIUserGetterImpl() *IUserServiceGetterImpl {
-	return &IUserServiceGetterImpl{}
 }
 
 //

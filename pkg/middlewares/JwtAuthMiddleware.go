@@ -1,13 +1,15 @@
 package middlewares
 
 import (
-	"com.github.goscaffold/config"
-	"com.github.goscaffold/internal/dao"
-	"com.github.goscaffold/internal/model/UserModel"
-	"com.github.goscaffold/pkg/utils"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"
+	"modi/config"
+	"modi/core/controllers"
+	"modi/internal/dao"
+
+	"modi/internal/model/UserModel"
+	"modi/pkg/utils"
 	"net/http"
 	"strings"
 	"time"
@@ -18,8 +20,8 @@ func JwtAuthMiddleware() gin.HandlerFunc {
 		path := c.Request.URL.Path
 		// 定义不需要JWT验证的路径
 		exceptPaths := map[string]bool{
-			"/login":    true,
-			"/register": true,
+			"/modi/v1/login":    true,
+			"/modi/v1/register": true,
 		}
 		// 如果请求路径在白名单中，则不进行JWT验证，直接继续处理请求
 		if _, ok := exceptPaths[path]; ok {
@@ -28,7 +30,8 @@ func JwtAuthMiddleware() gin.HandlerFunc {
 		}
 		tokenString := c.GetHeader("Authorization")
 		if tokenString == "" || !strings.HasPrefix(tokenString, "Bearer ") {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "jwt未获取"})
+			//c.JSON(http.StatusUnauthorized, gin.H{"error": "jwt未获取"})
+			controllers.ResultWrapper(c)(nil, "未获取到jwt")(controllers.Unauthorized)
 			c.Abort()
 			return
 		}

@@ -1,8 +1,8 @@
 package main
 
 import (
-	"com.github.goscaffold/pkg/utils"
 	"log"
+	"modi/pkg/utils"
 )
 
 func main() {

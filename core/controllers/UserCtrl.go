@@ -1,9 +1,9 @@
 package controllers
 
 import (
-	"com.github.goscaffold/internal/service"
-	"com.github.goscaffold/web/result"
 	"github.com/gin-gonic/gin"
+	"modi/core/result"
+	"modi/internal/service"
 )
 
 type UserController struct {
@@ -16,7 +16,7 @@ func NewUserHandler() *UserController {
 // GET /users/123
 
 // Build Build方法
-func (this *UserController) Build(r *gin.Engine) {
+func (this *UserController) Build(r *gin.RouterGroup) {
 	r.GET("/users", UserList)
 	r.GET("/user/:id", UserDetail)
 }

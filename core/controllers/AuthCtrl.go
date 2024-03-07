@@ -1,12 +1,12 @@
 package controllers
 
 import (
-	"com.github.goscaffold/config"
-	"com.github.goscaffold/internal/service"
-	"com.github.goscaffold/pkg/utils"
-	"com.github.goscaffold/web/dto"
-	"com.github.goscaffold/web/result"
 	"github.com/gin-gonic/gin"
+	"modi/config"
+	"modi/core/dto"
+	"modi/core/result"
+	"modi/internal/service"
+	"modi/pkg/utils"
 	"time"
 )
 
@@ -54,7 +54,7 @@ func (a *AuthController) SignUp(c *gin.Context) {
 	ResultWrapper(c)(true, "")(Created)
 }
 
-func (a *AuthController) Build(r *gin.Engine) {
+func (a *AuthController) Build(r *gin.RouterGroup) {
 	r.POST("/login", a.Login)
 	r.POST("/register", a.SignUp)
 }

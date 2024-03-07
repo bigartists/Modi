@@ -1,10 +1,10 @@
 package main
 
 import (
-	"com.github.goscaffold/config"
-	"com.github.goscaffold/pkg/utils"
 	"fmt"
 	"github.com/golang-jwt/jwt/v4"
+	"modi/config"
+	"modi/pkg/utils"
 	"time"
 )
 
