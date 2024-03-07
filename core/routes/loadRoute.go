@@ -6,6 +6,8 @@ import (
 )
 
 func Build(r *gin.Engine) {
-	controllers.NewUserHandler().Build(r)
-	controllers.NewAuthController().Build(r)
+	group := r.Group("/modi/v1") // *gin.RouterGroup
+	controllers.NewUserHandler().Build(group)
+	controllers.NewAuthController().Build(group)
+	controllers.NewDeploymentHandler().Build(group)
 }

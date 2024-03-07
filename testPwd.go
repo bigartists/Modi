@@ -1,10 +1,10 @@
 package main
 
 import (
-	"com.github.goscaffold/internal/model/UserModel"
 	"fmt"
 	"golang.org/x/crypto/bcrypt"
 	"log"
+	"modi/internal/model/UserModel"
 )
 
 func main() {

@@ -5,3 +5,4 @@ application.yaml
 .idea/
 .DS_Store
 .DS_Store/
+etc/*
