@@ -7,6 +7,7 @@ import (
 	"sync"
 )
 
+// 根据基本知识点，要实现自定义排序，需要实现sort.Interface接口的三个方法：Len()、Less()、Swap()；
 type PodMapStruct struct {
 	data sync.Map
 }
@@ -57,7 +58,7 @@ func (this *PodMapStruct) Delete(pod *corev1.Pod) {
 //	return nil, fmt.Errorf("ListByLabel record not found")
 //}
 
-func (this *PodMapStruct) ListByLabel(ns string, labels map[string]string) ([]*corev1.Pod, error) {
+func (this *PodMapStruct) ListByLabel(ns string, labels []map[string]string) ([]*corev1.Pod, error) {
 	fmt.Println("ns=", ns, "labels=", labels)
 	ret := make([]*corev1.Pod, 0)
 	if list, ok := this.data.Load(ns); ok {
@@ -73,20 +74,50 @@ func (this *PodMapStruct) ListByLabel(ns string, labels map[string]string) ([]*c
 			//pod.name= prodapi-57b8c559dd-5vsdj map[app:prod pod-template-hash:57b8c559dd security.istio.io/tlsMode:istio service.istio.io/canonical-name:prod service.istio.io/canonical-revision:latest]
 			//pod.name= prodapi-57b8c559dd-pkbwm map[app:prod pod-template-hash:57b8c559dd security.istio.io/tlsMode:istio service.istio.io/canonical-name:prod service.istio.io/canonical-revision:latest]
 
-			isSubset := true
-			for key, value := range labels {
-				if podValue, found := pod.Labels[key]; !found || podValue != value {
-					isSubset = false
-					break
+			for _, label := range labels {
+
+				isSubset := true
+				for key, value := range label {
+					if podValue, found := pod.Labels[key]; !found || podValue != value {
+						isSubset = false
+						break
+					}
 				}
+				if isSubset {
+					ret = append(ret, pod)
+				}
+
 			}
-			if isSubset {
-				ret = append(ret, pod)
-			}
+
 		}
 		return ret, nil
 	}
 	return nil, fmt.Errorf("pods not found ")
+}
+
+func (this *PodMapStruct) GetAllPods() ([]*corev1.Pod, error) {
+	var lists []*corev1.Pod
+	this.data.Range(func(key, value any) bool {
+		lists = append(lists, value.([]*corev1.Pod)...)
+		return true
+	})
+
+	if len(lists) == 0 {
+		return nil, fmt.Errorf("no pods found")
+	}
+
+	return lists, nil
+}
+
+func (this *PodMapStruct) GetDetail(ns string, podName string) (*corev1.Pod, error) {
+	if list, ok := this.data.Load(ns); ok {
+		for _, pod := range list.([]*corev1.Pod) {
+			if pod.Name == podName {
+				return pod, nil
+			}
+		}
+	}
+	return nil, fmt.Errorf("poddetail: record not found")
 }
 
 var PodMapInstance *PodMapStruct

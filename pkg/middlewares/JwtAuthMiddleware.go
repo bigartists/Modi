@@ -41,7 +41,7 @@ func JwtAuthMiddleware() gin.HandlerFunc {
 		getToken, err := utils.ParseToken(token, []byte(config.SysYamlconfig.Jwt.PublicKey))
 
 		if getToken != nil && getToken.Valid {
-			fmt.Println(getToken.Claims.(*utils.UserClaim).UserId)
+			//fmt.Println(getToken.Claims.(*utils.UserClaim).UserId)
 			userId := getToken.Claims.(*utils.UserClaim).UserId
 
 			// 将userId 转为int， 并调用 dao.DaoGetter.FindUserById

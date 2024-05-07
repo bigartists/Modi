@@ -10,4 +10,5 @@ func Build(r *gin.Engine) {
 	controllers.NewUserHandler().Build(group)
 	controllers.NewAuthController().Build(group)
 	controllers.NewDeploymentHandler().Build(group)
+	controllers.NewSecretController().Build(group)
 }
