@@ -51,27 +51,54 @@ func IncreaseReplicas(ns string, dep string, dec bool) (bool, error) {
 	return true, nil
 }
 
-func GetrslablebydeploymentListWatch(dep v1.Deployment, rslist []*v1.ReplicaSet) (map[string]string, error) {
+// 取出跟dep match的所有 rs，而不是最新的。 解决 2/1/1的问题；
+func GetrslablebydeploymentListWatch(dep v1.Deployment, rslist []*v1.ReplicaSet) ([]map[string]string, error) {
+	ret := make([]map[string]string, 0)
 	for _, item := range rslist {
-		if IsCurrentRsByDep(dep, *item) {
+		if IsRsFromDep(dep, *item) {
 			s, err := metav1.LabelSelectorAsMap(item.Spec.Selector)
 			if err != nil {
 				return nil, err
 			}
-			return s, nil
+			ret = append(ret, s)
 		}
 	}
-	return nil, nil
+	return ret, nil
 }
 
+// 判断当前的rs 是否是最新的；因此这个方法返回的 rs都是最新的rs；所以只会显示一个，而前面报错的就没法显示了；就导致访问dep显示 2/1/1，但pod只有报错的那个；
+
 func IsCurrentRsByDep(dep v1.Deployment, set v1.ReplicaSet) bool {
+	// 下面这一步是 判断是否是最新
 	if set.ObjectMeta.Annotations["deployment.kubernetes.io/revision"] != dep.ObjectMeta.Annotations["deployment.kubernetes.io/revision"] {
 		return false
 	}
+	return IsRsFromDep(dep, set)
+}
+
+// 判断 rs 是否属于某个dep，而不是判断它是最新的。 因此，得调用这个，才能解决 2/1/1的问题；
+func IsRsFromDep(dep v1.Deployment, set v1.ReplicaSet) bool {
 	for _, ref := range set.OwnerReferences {
 		if ref.Kind == "Deployment" && ref.Name == dep.Name {
 			return true
 		}
 	}
 	return false
+}
+
+// 判断deployment是否完成
+
+func GetDeploymentIsComplete(dep *v1.Deployment) bool {
+	return dep.Status.Replicas == dep.Status.AvailableReplicas
+}
+
+// 获取deployment失败状态
+
+func GetDeploymentCondition(dep *v1.Deployment) string {
+	for _, item := range dep.Status.Conditions {
+		if string(item.Type) == "Available" && string(item.Status) != "True" {
+			return item.Message
+		}
+	}
+	return ""
 }

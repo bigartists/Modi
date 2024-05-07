@@ -23,6 +23,18 @@ func WithReplicas(replicas [3]int32) DeploymentAttrFunc {
 	}
 }
 
+func WithIsComplete(is bool) DeploymentAttrFunc {
+	return func(dep *DeploymentImpl) {
+		dep.IsComplete = is
+	}
+}
+
+func WithMessage(msg string) DeploymentAttrFunc {
+	return func(dep *DeploymentImpl) {
+		dep.Message = msg
+	}
+}
+
 func WithImages(images string) DeploymentAttrFunc {
 	return func(dep *DeploymentImpl) {
 		dep.Images = images

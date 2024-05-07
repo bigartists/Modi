@@ -39,6 +39,24 @@ func WithMessage(message string) PodAttrFunc {
 	}
 }
 
+func WithIsReady(isReady bool) PodAttrFunc {
+	return func(pod *PodImpl) {
+		pod.IsReady = isReady
+	}
+}
+
+func WithNamespace(namespace string) PodAttrFunc {
+	return func(pod *PodImpl) {
+		pod.Namespace = namespace
+	}
+}
+
+func WithDeploymentName(deploymentName string) PodAttrFunc {
+	return func(pod *PodImpl) {
+		pod.DeploymentName = deploymentName
+	}
+}
+
 func (this PodAttrFuncs) apply(pod *PodImpl) {
 	for _, f := range this {
 		f(pod)

@@ -61,6 +61,20 @@ func (this *DeploymentMap) GetDeploymentsByNs(ns string) ([]*v1.Deployment, erro
 	}
 }
 
+func (this *DeploymentMap) GetAllDeployment() ([]*v1.Deployment, error) {
+	var lists []*v1.Deployment
+	this.data.Range(func(key, value any) bool {
+		lists = append(lists, value.([]*v1.Deployment)...)
+		return true
+	})
+
+	if len(lists) == 0 {
+		return nil, fmt.Errorf("no deployment found")
+	}
+
+	return lists, nil
+}
+
 func (this *DeploymentMap) GetDeploymentByName(ns string, name string) (*v1.Deployment, error) {
 	if list, ok := this.data.Load(ns); ok {
 		for _, dep := range list.([]*v1.Deployment) {
@@ -93,6 +107,5 @@ func (d DeploymentHandler) OnUpdate(oldObj, newObj interface{}) {
 }
 
 func (d DeploymentHandler) OnDelete(obj interface{}) {
-	//TODO implement me
-	panic("implement me")
+	DeploymentMapInstance.Delete(obj.(*v1.Deployment))
 }

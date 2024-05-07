@@ -9,6 +9,8 @@ type DeploymentImpl struct {
 	Images     string
 	CreateTime string
 	Pods       []*PodModel.PodImpl
+	IsComplete bool // 是否完成
+	Message    string
 }
 
 func New(attrs ...DeploymentAttrFunc) *DeploymentImpl {
