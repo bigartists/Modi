@@ -5,7 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"
 	"modi/config"
-	"modi/core/controllers"
+	"modi/internal/controllers"
 	"modi/internal/dao"
 
 	"modi/internal/model/UserModel"

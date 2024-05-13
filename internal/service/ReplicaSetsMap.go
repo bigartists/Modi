@@ -1,9 +1,8 @@
-package kind
+package service
 
 import (
 	"fmt"
 	v1 "k8s.io/api/apps/v1"
-	"log"
 	"sync"
 )
 
@@ -53,26 +52,6 @@ func (this *RsMapStruct) RsByNs(ns string) ([]*v1.ReplicaSet, error) {
 }
 
 var RsMapInstance *RsMapStruct
-
-type RsHandler struct {
-}
-
-func (r RsHandler) OnAdd(obj interface{}, isInInitialList bool) {
-	RsMapInstance.Add(obj.(*v1.ReplicaSet))
-}
-
-func (r RsHandler) OnUpdate(oldObj, newObj interface{}) {
-	err := RsMapInstance.Update(newObj.(*v1.ReplicaSet))
-	if err != nil {
-		log.Println(err)
-	}
-}
-
-func (r RsHandler) OnDelete(obj interface{}) {
-	if d, ok := obj.(*v1.ReplicaSet); ok {
-		RsMapInstance.Delete(d)
-	}
-}
 
 func init() {
 	RsMapInstance = &RsMapStruct{}

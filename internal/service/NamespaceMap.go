@@ -1,4 +1,4 @@
-package kind
+package service
 
 import (
 	"fmt"
@@ -45,27 +45,8 @@ func (this *NamespaceMap) GetAllNamespaces() []string {
 	return namespaces
 }
 
-type NamespaceHandler struct {
-}
-
 var NamespaceMapInstance *NamespaceMap
 
 func init() {
 	NamespaceMapInstance = &NamespaceMap{}
-}
-
-func (nh NamespaceHandler) OnAdd(obj interface{}, isInInitialList bool) {
-	NamespaceMapInstance.Add(obj.(*corev1.Namespace))
-}
-
-func (nh NamespaceHandler) OnUpdate(oldObj, newObj interface{}) {
-	err := NamespaceMapInstance.Update(newObj.(*corev1.Namespace))
-	if err != nil {
-		return
-	}
-}
-
-func (nh NamespaceHandler) OnDelete(obj interface{}) {
-	namespace := obj.(*corev1.Namespace)
-	NamespaceMapInstance.Delete(namespace)
 }

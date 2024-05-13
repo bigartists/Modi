@@ -4,9 +4,8 @@ import (
 	"fmt"
 	v1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
-	"modi/core/result"
-	"modi/internal/kind"
-	"modi/internal/kind/DomainUtils"
+	"modi/internal/result"
+
 	Model "modi/internal/model/DeploymentModel"
 	"modi/internal/model/PodModel"
 	"modi/pkg/utils"
@@ -19,11 +18,11 @@ type IDeploymentServiceGetterImpl struct {
 }
 
 func (I IDeploymentServiceGetterImpl) GetNs() *result.ErrorResult {
-	return result.Result(kind.NamespaceMapInstance.GetAllNamespaces(), nil)
+	return result.Result(NamespaceMapInstance.GetAllNamespaces(), nil)
 }
 
 func (I IDeploymentServiceGetterImpl) DeletePod(ns string, pod string) *result.ErrorResult {
-	ret, err := DomainUtils.DeletePod(ns, pod)
+	ret, err := DeletePod(ns, pod)
 	if err != nil {
 		return result.Result(nil, err)
 	} else {
@@ -32,7 +31,7 @@ func (I IDeploymentServiceGetterImpl) DeletePod(ns string, pod string) *result.E
 }
 
 func (I IDeploymentServiceGetterImpl) GetPodJson(ns string, pod string) *result.ErrorResult {
-	json, err := kind.PodMapInstance.GetDetail(ns, pod)
+	json, err := PodMapInstance.GetDetail(ns, pod)
 	if err != nil {
 		return result.Result(nil, fmt.Errorf("getPodJson: record not found"))
 	} else {
@@ -45,11 +44,11 @@ func (I IDeploymentServiceGetterImpl) GetPods(ns string, dname string) *result.E
 	var pods []*corev1.Pod
 	var err error
 	if dname == "" {
-		pods, err = kind.PodMapInstance.GetAllPods()
+		pods, err = PodMapInstance.GetAllPods()
 		if err != nil {
 			return nil
 		}
-		podsList := DomainUtils.RenderPods(pods)
+		podsList := RenderPods(pods)
 		if ns == "" {
 			return result.Result(podsList, nil)
 		} else {
@@ -62,17 +61,17 @@ func (I IDeploymentServiceGetterImpl) GetPods(ns string, dname string) *result.E
 			return result.Result(ret, nil)
 		}
 	} else {
-		dep, err := kind.DeploymentMapInstance.GetDeploymentByName(ns, dname)
+		dep, err := DeploymentMapInstance.GetDeploymentByName(ns, dname)
 		if err != nil {
 			return result.Result(nil, fmt.Errorf("GetDeployment: record not found"))
 		}
-		pods := DomainUtils.GetPods(*dep, ns, dname)
+		pods := GetPods(*dep, ns, dname)
 		return result.Result(pods, nil)
 	}
 }
 
 func (I IDeploymentServiceGetterImpl) GetDeploymentDetailByNsDName(ns string, dname string) *result.ErrorResult {
-	dep, err := kind.DeploymentMapInstance.GetDeploymentByName(ns, dname)
+	dep, err := DeploymentMapInstance.GetDeploymentByName(ns, dname)
 	if err != nil {
 		return result.Result(nil, fmt.Errorf("GetDeployment: record not found"))
 	} else {
@@ -82,15 +81,15 @@ func (I IDeploymentServiceGetterImpl) GetDeploymentDetailByNsDName(ns string, dn
 			Model.WithNamespace(dep.Namespace),
 			Model.WithCreateTime(utils.FormatTime(dep.CreationTimestamp)),
 			Model.WithReplicas([3]int32{dep.Status.Replicas, dep.Status.AvailableReplicas, dep.Status.UnavailableReplicas}),
-			Model.WithImages(DomainUtils.GetImages(*dep)),
-			Model.WithPods(DomainUtils.GetPods(*dep, ns, dname)),
+			Model.WithImages(GetImages(*dep)),
+			Model.WithPods(GetPods(*dep, ns, dname)),
 		)
 		return result.Result(ret, nil)
 	}
 }
 
 func (I IDeploymentServiceGetterImpl) IncrReplicas(ns string, dep string, dec bool) *result.ErrorResult {
-	isSucceed, err := DomainUtils.IncreaseReplicas(ns, dep, dec)
+	isSucceed, err := IncreaseReplicas(ns, dep, dec)
 	return result.Result(isSucceed, err)
 }
 
@@ -98,16 +97,16 @@ func (I IDeploymentServiceGetterImpl) GetDeploymentsByNs(ns string) *result.Erro
 	var list []*v1.Deployment
 	var err error
 	if ns == "" {
-		list, err = kind.DeploymentMapInstance.GetAllDeployment()
+		list, err = DeploymentMapInstance.GetAllDeployment()
 	} else {
-		list, err = kind.DeploymentMapInstance.GetDeploymentsByNs(ns)
+		list, err = DeploymentMapInstance.GetDeploymentsByNs(ns)
 	}
 
 	if err != nil {
 		return result.Result(nil, fmt.Errorf("record not found"))
 	} else {
 		var ret []*Model.DeploymentImpl
-		sortList := kind.CoreV1Deployments(list)
+		sortList := CoreV1Deployments(list)
 		sort.Sort(sortList)
 
 		for _, item := range sortList {
@@ -116,9 +115,9 @@ func (I IDeploymentServiceGetterImpl) GetDeploymentsByNs(ns string) *result.Erro
 				Model.WithNamespace(item.Namespace),
 				Model.WithCreateTime(utils.FormatTime(item.CreationTimestamp)),
 				Model.WithReplicas([3]int32{item.Status.Replicas, item.Status.AvailableReplicas, item.Status.UnavailableReplicas}),
-				Model.WithImages(DomainUtils.GetImages(*item)),
-				Model.WithIsComplete(DomainUtils.GetDeploymentIsComplete(item)),
-				Model.WithMessage(DomainUtils.GetDeploymentCondition(item)),
+				Model.WithImages(GetImages(*item)),
+				Model.WithIsComplete(GetDeploymentIsComplete(item)),
+				Model.WithMessage(GetDeploymentCondition(item)),
 			))
 		}
 		return result.Result(ret, nil)

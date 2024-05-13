@@ -2,7 +2,7 @@ package middlewares
 
 import (
 	"github.com/gin-gonic/gin"
-	"modi/core/controllers"
+	"modi/internal/controllers"
 )
 
 func ErrorHandler() gin.HandlerFunc {

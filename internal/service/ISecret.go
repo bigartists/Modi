@@ -2,8 +2,8 @@ package service
 
 import (
 	"github.com/gin-gonic/gin"
-	"modi/core/result"
 	Model "modi/internal/model/SecretModel"
+	"modi/internal/result"
 )
 
 type ISecret interface {

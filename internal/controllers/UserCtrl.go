@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"github.com/gin-gonic/gin"
-	"modi/core/result"
+	"modi/internal/result"
 	"modi/internal/service"
 )
 
