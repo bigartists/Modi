@@ -1,10 +1,8 @@
 package controllers
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
-	"modi/pkg/globalConstants"
-	"net/http"
+	"modi/pkg/vars"
 	"sync"
 )
 
@@ -34,11 +32,12 @@ func init() {
 	}
 }
 
-type ResultFunc func(result interface{}, message string) func(output Output)
-type Output func(c *gin.Context, v interface{})
+type Output1 func(c *gin.Context, v interface{}) interface{}
 
-func ResultWrapper(c *gin.Context) ResultFunc {
-	return func(result interface{}, message string) func(output Output) {
+type ResultFunc1 func(result interface{}, message string) func(output Output1) interface{}
+
+func ResultWrapper1(c *gin.Context) ResultFunc1 {
+	return func(result interface{}, message string) func(output Output1) interface{} {
 		r := ResultPool.Get().(*JSONResult)
 		defer ResultPool.Put(r)
 		r.Message = message
@@ -52,54 +51,52 @@ func ResultWrapper(c *gin.Context) ResultFunc {
 		//	"token": token,
 		//}
 
-		return func(output Output) {
-			output(c, r)
+		return func(output Output1) interface{} {
+			return output(c, r)
 		}
 	}
 }
 
-func OK(c *gin.Context, v interface{}) {
+func OK1(c *gin.Context, v interface{}) interface{} {
 	// 将v 转成 *JSONResult 类型
 	if r, ok := v.(*JSONResult); ok {
-		r.Code = globalConstants.HTTPSUCCESS
-		r.Message = globalConstants.HTTPMESSAGESUCCESS
+		r.Code = vars.HTTPSUCCESS
+		r.Message = vars.HTTPMESSAGESUCCESS
+		return r
 	}
-	c.JSON(200, v)
+	return nil
 }
 
-func Created(c *gin.Context, v interface{}) {
+func Created1(c *gin.Context, v interface{}) interface{} {
 	// 将v 转成 *JSONResult 类型
 	if r, ok := v.(*JSONResult); ok {
-		r.Code = globalConstants.HTTPSUCCESS
-		r.Message = globalConstants.HTTPMESSAGESUCCESS
+		r.Code = vars.HTTPSUCCESS
+		r.Message = vars.HTTPMESSAGESUCCESS
+		return r
 	}
-	c.JSON(http.StatusCreated, v)
+	return nil
 }
 
-func Error(c *gin.Context, v interface{}) {
+func Error1(c *gin.Context, v interface{}) interface{} {
 	// 将v 转成 *JSONResult 类型
 	if r, ok := v.(*JSONResult); ok {
-		r.Code = globalConstants.HTTPFAIL
+		r.Code = vars.HTTPFAIL
 		if r.Message == "" {
-			r.Message = globalConstants.HTTPMESSAGEFAIL
+			r.Message = vars.HTTPMESSAGEFAIL
 		}
+		return r
 	}
-	c.JSON(400, v)
+	return nil
 }
 
-// 未授权
-
-func Unauthorized(c *gin.Context, v interface{}) {
+func Unauthorized1(c *gin.Context, v interface{}) interface{} {
 	// 将v 转成 *JSONResult 类型
 	if r, ok := v.(*JSONResult); ok {
-		r.Code = globalConstants.HTTPUNAUTHORIZED
+		r.Code = vars.HTTPUNAUTHORIZED
 		if r.Message == "" {
-			r.Message = globalConstants.HTTPMESSAGEUNAUTHORIZED
+			r.Message = vars.HTTPMESSAGEUNAUTHORIZED
 		}
+		return r
 	}
-	c.JSON(401, v)
-}
-
-func OK2String(c *gin.Context, v interface{}) {
-	c.String(200, fmt.Sprintf("%v", v))
+	return nil
 }

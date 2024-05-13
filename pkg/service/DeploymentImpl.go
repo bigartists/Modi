@@ -4,10 +4,10 @@ import (
 	"fmt"
 	v1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
-	"modi/internal/result"
+	"modi/pkg/model/DeploymentModel"
+	"modi/pkg/model/PodModel"
+	"modi/pkg/result"
 
-	Model "modi/internal/model/DeploymentModel"
-	"modi/internal/model/PodModel"
 	"modi/pkg/utils"
 	"sort"
 )
@@ -75,14 +75,14 @@ func (I IDeploymentServiceGetterImpl) GetDeploymentDetailByNsDName(ns string, dn
 	if err != nil {
 		return result.Result(nil, fmt.Errorf("GetDeployment: record not found"))
 	} else {
-		var ret *Model.DeploymentImpl
-		ret = Model.New(
-			Model.WithName(dep.Name),
-			Model.WithNamespace(dep.Namespace),
-			Model.WithCreateTime(utils.FormatTime(dep.CreationTimestamp)),
-			Model.WithReplicas([3]int32{dep.Status.Replicas, dep.Status.AvailableReplicas, dep.Status.UnavailableReplicas}),
-			Model.WithImages(GetImages(*dep)),
-			Model.WithPods(GetPods(*dep, ns, dname)),
+		var ret *DeploymentModel.DeploymentImpl
+		ret = DeploymentModel.New(
+			DeploymentModel.WithName(dep.Name),
+			DeploymentModel.WithNamespace(dep.Namespace),
+			DeploymentModel.WithCreateTime(utils.FormatTime(dep.CreationTimestamp)),
+			DeploymentModel.WithReplicas([3]int32{dep.Status.Replicas, dep.Status.AvailableReplicas, dep.Status.UnavailableReplicas}),
+			DeploymentModel.WithImages(GetImages(*dep)),
+			DeploymentModel.WithPods(GetPods(*dep, ns, dname)),
 		)
 		return result.Result(ret, nil)
 	}
@@ -105,19 +105,19 @@ func (I IDeploymentServiceGetterImpl) GetDeploymentsByNs(ns string) *result.Erro
 	if err != nil {
 		return result.Result(nil, fmt.Errorf("record not found"))
 	} else {
-		var ret []*Model.DeploymentImpl
+		var ret []*DeploymentModel.DeploymentImpl
 		sortList := CoreV1Deployments(list)
 		sort.Sort(sortList)
 
 		for _, item := range sortList {
-			ret = append(ret, Model.New(
-				Model.WithName(item.Name),
-				Model.WithNamespace(item.Namespace),
-				Model.WithCreateTime(utils.FormatTime(item.CreationTimestamp)),
-				Model.WithReplicas([3]int32{item.Status.Replicas, item.Status.AvailableReplicas, item.Status.UnavailableReplicas}),
-				Model.WithImages(GetImages(*item)),
-				Model.WithIsComplete(GetDeploymentIsComplete(item)),
-				Model.WithMessage(GetDeploymentCondition(item)),
+			ret = append(ret, DeploymentModel.New(
+				DeploymentModel.WithName(item.Name),
+				DeploymentModel.WithNamespace(item.Namespace),
+				DeploymentModel.WithCreateTime(utils.FormatTime(item.CreationTimestamp)),
+				DeploymentModel.WithReplicas([3]int32{item.Status.Replicas, item.Status.AvailableReplicas, item.Status.UnavailableReplicas}),
+				DeploymentModel.WithImages(GetImages(*item)),
+				DeploymentModel.WithIsComplete(GetDeploymentIsComplete(item)),
+				DeploymentModel.WithMessage(GetDeploymentCondition(item)),
 			))
 		}
 		return result.Result(ret, nil)

@@ -1,6 +1,8 @@
 package DeploymentModel
 
-import "modi/internal/model/PodModel"
+import (
+	"modi/pkg/model/PodModel"
+)
 
 type DeploymentImpl struct {
 	Name       string

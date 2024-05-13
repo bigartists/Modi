@@ -1,8 +1,8 @@
 package service
 
 import (
-	"modi/internal/model/UserModel"
-	"modi/internal/result"
+	"modi/pkg/model/UserModel"
+	"modi/pkg/result"
 )
 
 type IUser interface {

@@ -4,7 +4,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/informers"
 	"modi/client"
-	"modi/internal/service"
+	"modi/pkg/service"
 )
 
 func InitInformerListener() {

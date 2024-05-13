@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/cobra"
-	dbs "modi/internal/dao"
-	"modi/internal/routes"
-	"modi/listener"
+	dbs "modi/pkg/dao"
+	"modi/pkg/listener"
 	middlewares "modi/pkg/middlewares"
+	"modi/pkg/routes"
 	"modi/pkg/validators"
 )
 

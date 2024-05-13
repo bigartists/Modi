@@ -1,6 +1,8 @@
 package DeploymentModel
 
-import "modi/internal/model/PodModel"
+import (
+	"modi/pkg/model/PodModel"
+)
 
 type DeploymentAttrFunc func(*DeploymentImpl)
 type DeploymentAttrFuncs []DeploymentAttrFunc

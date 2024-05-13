@@ -2,7 +2,7 @@ package middlewares
 
 import (
 	"github.com/gin-gonic/gin"
-	"modi/internal/controllers"
+	"modi/pkg/controllers"
 )
 
 func ErrorHandler() gin.HandlerFunc {
@@ -10,7 +10,8 @@ func ErrorHandler() gin.HandlerFunc {
 		defer func() {
 			if err := recover(); err != nil {
 				//context.JSON(500, gin.H{"error": err})
-				controllers.ResultWrapper(context)(nil, err.(string))(controllers.Error)
+				ret := controllers.ResultWrapper1(context)(nil, err.(string))(controllers.Error1)
+				context.JSON(500, ret)
 			}
 		}()
 		context.Next()

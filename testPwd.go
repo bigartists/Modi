@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"golang.org/x/crypto/bcrypt"
 	"log"
-	"modi/internal/model/UserModel"
+	"modi/pkg/model/UserModel"
 )
 
 func main() {
