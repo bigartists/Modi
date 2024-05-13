@@ -1,6 +1,8 @@
 package dao
 
-import "modi/internal/model/UserModel"
+import (
+	"modi/pkg/model/UserModel"
+)
 
 type IUserDao interface {
 	FindUserAll() []*UserModel.UserImpl

@@ -1,4 +1,4 @@
-package globalConstants
+package vars
 
 const (
 	ContextKeyToken         = "token"

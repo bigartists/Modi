@@ -2,9 +2,10 @@ package controllers
 
 import (
 	"github.com/gin-gonic/gin"
-	Model "modi/internal/model/SecretModel"
-	"modi/internal/result"
-	"modi/internal/service"
+	Model "modi/pkg/model/SecretModel"
+	"modi/pkg/result"
+	"modi/pkg/service"
+	"net/http"
 )
 
 type SecretController struct {
@@ -27,11 +28,13 @@ func secretList(c *gin.Context) {
 		Namespace string `form:"ns"`
 	}{}
 	result.Result(c.ShouldBindQuery(namespace)).Unwrap()
-	ResultWrapper(c)(service.SecretServiceGetter.GetSecretByNs(namespace.Namespace).Unwrap(), "")(OK)
+	ret := ResultWrapper1(c)(service.SecretServiceGetter.GetSecretByNs(namespace.Namespace).Unwrap(), "")(OK1)
+	c.JSON(http.StatusOK, ret)
 }
 
 func postSecret(c *gin.Context) {
 	postModel := &Model.PostSecretModel{}
 	result.Result(c.ShouldBindJSON(postModel))
-	ResultWrapper(c)(service.SecretServiceGetter.PostSecret(postModel, c).Unwrap(), "")(OK)
+	ret := ResultWrapper1(c)(service.SecretServiceGetter.PostSecret(postModel, c).Unwrap(), "")(OK1)
+	c.JSON(http.StatusOK, ret)
 }

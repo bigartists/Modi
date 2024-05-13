@@ -5,9 +5,9 @@ import (
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"modi/client"
-	"modi/internal/result"
+	"modi/pkg/model/SecretModel"
+	"modi/pkg/result"
 
-	Model "modi/internal/model/SecretModel"
 	"modi/pkg/utils"
 )
 
@@ -16,7 +16,7 @@ var SecretServiceGetter ISecret
 type ISecretServiceGetterImpl struct {
 }
 
-func (I ISecretServiceGetterImpl) PostSecret(secret *Model.PostSecretModel, c *gin.Context) *result.ErrorResult {
+func (I ISecretServiceGetterImpl) PostSecret(secret *SecretModel.PostSecretModel, c *gin.Context) *result.ErrorResult {
 	_, err := client.K8sClient.CoreV1().Secrets(secret.Namespace).Create(
 		c,
 		&v1.Secret{
@@ -47,15 +47,15 @@ func (I ISecretServiceGetterImpl) GetSecretByNs(ns string) *result.ErrorResult {
 
 	}
 
-	var ret []*Model.SecretModel
+	var ret []*SecretModel.SecretModel
 	for _, item := range list {
-		ret = append(ret, Model.New(
-			Model.WithName(item.Name),
-			Model.WithNamespace(item.Namespace),
-			Model.WithCreateTime(
+		ret = append(ret, SecretModel.New(
+			SecretModel.WithName(item.Name),
+			SecretModel.WithNamespace(item.Namespace),
+			SecretModel.WithCreateTime(
 				utils.FormatTime(item.CreationTimestamp),
 			),
-			Model.WithType(Model.SECRET_TYPE[string(item.Type)]),
+			SecretModel.WithType(SecretModel.SECRET_TYPE[string(item.Type)]),
 		))
 	}
 

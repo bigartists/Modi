@@ -2,8 +2,8 @@ package controllers
 
 import (
 	"github.com/gin-gonic/gin"
-	"modi/internal/result"
-	"modi/internal/service"
+	"modi/pkg/result"
+	"modi/pkg/service"
 )
 
 type UserController struct {
@@ -22,7 +22,8 @@ func (this *UserController) Build(r *gin.RouterGroup) {
 }
 
 func UserList(c *gin.Context) {
-	ResultWrapper(c)(service.UserServiceGetter.GetUserList(), "")(OK)
+	ret := ResultWrapper1(c)(service.UserServiceGetter.GetUserList(), "")(OK1)
+	c.JSON(200, ret)
 }
 
 func UserDetail(c *gin.Context) {
@@ -30,7 +31,8 @@ func UserDetail(c *gin.Context) {
 		Id int64 `uri:"id" binding:"required"`
 	}{}
 	result.Result(c.ShouldBindUri(id)).Unwrap()
-	ResultWrapper(c)(service.UserServiceGetter.GetUserDetail(id.Id).Unwrap(), "")(OK)
+	ret := ResultWrapper1(c)(service.UserServiceGetter.GetUserDetail(id.Id).Unwrap(), "")(OK1)
+	c.JSON(200, ret)
 }
 
 //

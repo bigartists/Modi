@@ -5,10 +5,10 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"
 	"modi/config"
-	"modi/internal/controllers"
-	"modi/internal/dao"
+	"modi/pkg/controllers"
+	"modi/pkg/dao"
+	"modi/pkg/model/UserModel"
 
-	"modi/internal/model/UserModel"
 	"modi/pkg/utils"
 	"net/http"
 	"strings"
@@ -31,7 +31,8 @@ func JwtAuthMiddleware() gin.HandlerFunc {
 		tokenString := c.GetHeader("Authorization")
 		if tokenString == "" || !strings.HasPrefix(tokenString, "Bearer ") {
 			//c.JSON(http.StatusUnauthorized, gin.H{"error": "jwt未获取"})
-			controllers.ResultWrapper(c)(nil, "未获取到jwt")(controllers.Unauthorized)
+			ret := controllers.ResultWrapper1(c)(nil, "未获取到jwt")(controllers.Unauthorized1)
+			c.JSON(http.StatusUnauthorized, ret)
 			c.Abort()
 			return
 		}

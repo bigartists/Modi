@@ -2,9 +2,9 @@ package service
 
 import (
 	"fmt"
-	"modi/internal/dao"
-	"modi/internal/model/UserModel"
-	"modi/internal/result"
+	"modi/pkg/dao"
+	UserModel2 "modi/pkg/model/UserModel"
+	"modi/pkg/result"
 )
 
 var UserServiceGetter IUser
@@ -20,7 +20,7 @@ func NewIUserGetterImpl() *IUserServiceGetterImpl {
 type IUserServiceGetterImpl struct {
 }
 
-func (this *IUserServiceGetterImpl) SignIn(username string, password string) (*UserModel.UserImpl, error) {
+func (this *IUserServiceGetterImpl) SignIn(username string, password string) (*UserModel2.UserImpl, error) {
 	user, err := dao.UserGetter.FindUserByUsername(username)
 	if err != nil {
 		return nil, err
@@ -47,7 +47,7 @@ func (this *IUserServiceGetterImpl) SignUp(email string, username string, passwo
 		return fmt.Errorf("邮箱%s已存在", email)
 	}
 
-	user := UserModel.New(UserModel.WithEmail(email), UserModel.WithUsername(username), UserModel.WithPassword(password))
+	user := UserModel2.New(UserModel2.WithEmail(email), UserModel2.WithUsername(username), UserModel2.WithPassword(password))
 	err := user.GeneratePassword()
 	if err != nil {
 		return fmt.Errorf("密码加密失败")
@@ -61,14 +61,14 @@ func (this *IUserServiceGetterImpl) SignUp(email string, username string, passwo
 	return nil
 }
 
-func (this *IUserServiceGetterImpl) GetUserList() []*UserModel.UserImpl {
+func (this *IUserServiceGetterImpl) GetUserList() []*UserModel2.UserImpl {
 	users := dao.UserGetter.FindUserAll()
 	return users
 }
 
 func (this *IUserServiceGetterImpl) GetUserDetail(id int64) *result.ErrorResult {
 	//TODO implement me
-	user := UserModel.New()
+	user := UserModel2.New()
 	_, err := dao.UserGetter.FindUserById(id, user)
 	if err != nil {
 		return result.Result(nil, err)
@@ -76,12 +76,12 @@ func (this *IUserServiceGetterImpl) GetUserDetail(id int64) *result.ErrorResult 
 	return result.Result(user, nil)
 }
 
-func (this *IUserServiceGetterImpl) CreateUser(user *UserModel.UserImpl) *result.ErrorResult {
+func (this *IUserServiceGetterImpl) CreateUser(user *UserModel2.UserImpl) *result.ErrorResult {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (this *IUserServiceGetterImpl) UpdateUser(id int, user *UserModel.UserImpl) *result.ErrorResult {
+func (this *IUserServiceGetterImpl) UpdateUser(id int, user *UserModel2.UserImpl) *result.ErrorResult {
 	//TODO implement me
 	panic("implement me")
 }

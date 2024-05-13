@@ -7,12 +7,12 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"modi/client"
-	"modi/internal/model/PodModel"
+	PodModel2 "modi/pkg/model/PodModel"
 	"sort"
 )
 
-func GetPods(dep v1.Deployment, ns string, dname string) []*PodModel.PodImpl {
-	var ret []*PodModel.PodImpl
+func GetPods(dep v1.Deployment, ns string, dname string) []*PodModel2.PodImpl {
+	var ret []*PodModel2.PodImpl
 
 	// 取得所有的 rs
 	rsList, err := RsMapInstance.RsByNs(ns)
@@ -26,7 +26,7 @@ func GetPods(dep v1.Deployment, ns string, dname string) []*PodModel.PodImpl {
 	return ret
 }
 
-func ListPodsByLabels(ns string, labels []map[string]string) []*PodModel.PodImpl {
+func ListPodsByLabels(ns string, labels []map[string]string) []*PodModel2.PodImpl {
 	pods, err := PodMapInstance.ListByLabel(ns, labels)
 	if err != nil {
 		return nil
@@ -35,22 +35,22 @@ func ListPodsByLabels(ns string, labels []map[string]string) []*PodModel.PodImpl
 	return ret
 }
 
-func RenderPods(pods []*corev1.Pod) []*PodModel.PodImpl {
-	var ret []*PodModel.PodImpl
+func RenderPods(pods []*corev1.Pod) []*PodModel2.PodImpl {
+	var ret []*PodModel2.PodImpl
 
 	sortPods := CoreV1Pods(pods)
 	sort.Sort(sortPods)
 
 	for _, item := range sortPods {
-		ret = append(ret, PodModel.New(
-			PodModel.WithName(item.Name),
-			PodModel.WithImages(GetImagesByPod(item.Spec.Containers)),
-			PodModel.WithPhase(string(item.Status.Phase)),
-			PodModel.WithNodeName(item.Spec.NodeName),
-			PodModel.WithCreateTime(item.CreationTimestamp.String()),
-			PodModel.WithMessage(GetPodMessage(*item)),
-			PodModel.WithIsReady(GetPodIsReady(*item)),
-			PodModel.WithNamespace(item.Namespace),
+		ret = append(ret, PodModel2.New(
+			PodModel2.WithName(item.Name),
+			PodModel2.WithImages(GetImagesByPod(item.Spec.Containers)),
+			PodModel2.WithPhase(string(item.Status.Phase)),
+			PodModel2.WithNodeName(item.Spec.NodeName),
+			PodModel2.WithCreateTime(item.CreationTimestamp.String()),
+			PodModel2.WithMessage(GetPodMessage(*item)),
+			PodModel2.WithIsReady(GetPodIsReady(*item)),
+			PodModel2.WithNamespace(item.Namespace),
 			// todo 在pod中反向取 deployment 名称，待解决
 			//PodModel.WithDeploymentName(item.Labels["app"]),
 		))

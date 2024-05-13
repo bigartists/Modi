@@ -1,6 +1,8 @@
 package service
 
-import "modi/internal/result"
+import (
+	"modi/pkg/result"
+)
 
 type IDeployment interface {
 	GetDeploymentsByNs(ns string) *result.ErrorResult

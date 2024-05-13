@@ -3,9 +3,9 @@ package controllers
 import (
 	"github.com/gin-gonic/gin"
 	"modi/config"
-	"modi/internal/dto"
-	"modi/internal/result"
-	"modi/internal/service"
+	"modi/pkg/dto"
+	"modi/pkg/result"
+	"modi/pkg/service"
 	"modi/pkg/utils"
 	"time"
 )
@@ -27,8 +27,8 @@ func (a *AuthController) Login(c *gin.Context) {
 
 	user, err := service.UserServiceGetter.SignIn(params.Username, params.Password)
 	if err != nil {
-		ResultWrapper(c)(nil, err.Error())(Error)
-		return
+		ret := ResultWrapper1(c)(nil, err.Error())(Error1)
+		c.JSON(400, ret)
 	}
 
 	//// 生成 token
@@ -37,7 +37,8 @@ func (a *AuthController) Login(c *gin.Context) {
 	token, _ := utils.GenerateToken(user.Id, prikey, curTime)
 
 	c.Set("token", token)
-	ResultWrapper(c)(user, "")(OK)
+	ret := ResultWrapper1(c)(user, "")(OK1)
+	c.JSON(200, ret)
 }
 
 func (a *AuthController) SignUp(c *gin.Context) {
@@ -48,10 +49,11 @@ func (a *AuthController) SignUp(c *gin.Context) {
 
 	err := service.UserServiceGetter.SignUp(params.Email, params.Username, params.Password)
 	if err != nil {
-		ResultWrapper(c)(nil, err.Error())(Error)
-		return
+		ret := ResultWrapper1(c)(nil, err.Error())(Error1)
+		c.JSON(400, ret)
 	}
-	ResultWrapper(c)(true, "")(Created)
+	ret := ResultWrapper1(c)(true, "")(Created1)
+	c.JSON(201, ret)
 }
 
 func (a *AuthController) Build(r *gin.RouterGroup) {
