@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/cobra"
-	"modi/client"
-	"modi/core/routes"
 	dbs "modi/internal/dao"
+	"modi/internal/routes"
+	"modi/listener"
 	middlewares "modi/pkg/middlewares"
 	"modi/pkg/validators"
 )
@@ -19,7 +19,7 @@ func Run(port int) error {
 	// 执行命令行
 	dbs.InitDB()
 	// 初始化k8s client
-	client.InitInformerListener()
+	listener.InitInformerListener()
 	r := gin.New()
 
 	r.Use(middlewares.JwtAuthMiddleware())

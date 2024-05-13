@@ -1,9 +1,8 @@
-package kind
+package service
 
 import (
 	"fmt"
 	corev1 "k8s.io/api/core/v1"
-	"log"
 	"sync"
 )
 
@@ -121,25 +120,6 @@ func (this *PodMapStruct) GetDetail(ns string, podName string) (*corev1.Pod, err
 }
 
 var PodMapInstance *PodMapStruct
-
-type PodHandler struct{}
-
-func (p PodHandler) OnAdd(obj interface{}, isInInitialList bool) {
-	PodMapInstance.Add(obj.(*corev1.Pod))
-}
-
-func (p PodHandler) OnUpdate(oldObj, newObj interface{}) {
-	err := PodMapInstance.Update(newObj.(*corev1.Pod))
-	if err != nil {
-		log.Println(err)
-	}
-}
-
-func (p PodHandler) OnDelete(obj interface{}) {
-	if d, ok := obj.(*corev1.Pod); ok {
-		PodMapInstance.Delete(d)
-	}
-}
 
 func init() {
 	PodMapInstance = &PodMapStruct{}

@@ -5,8 +5,8 @@ import (
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"modi/client"
-	"modi/core/result"
-	"modi/internal/kind"
+	"modi/internal/result"
+
 	Model "modi/internal/model/SecretModel"
 	"modi/pkg/utils"
 )
@@ -41,9 +41,9 @@ func (I ISecretServiceGetterImpl) GetSecretByNs(ns string) *result.ErrorResult {
 	var list []*v1.Secret
 
 	if ns == "" {
-		list = kind.SecretMapInstance.ListAll()
+		list = SecretMapInstance.ListAll()
 	} else {
-		list = kind.SecretMapInstance.ListAllByNs(ns)
+		list = SecretMapInstance.ListAllByNs(ns)
 
 	}
 

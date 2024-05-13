@@ -1,4 +1,4 @@
-package kind
+package service
 
 import (
 	"fmt"
@@ -86,26 +86,8 @@ func (this *DeploymentMap) GetDeploymentByName(ns string, name string) (*v1.Depl
 	return nil, fmt.Errorf("GetDeployment: record not found")
 }
 
-type DeploymentHandler struct {
-}
-
 var DeploymentMapInstance *DeploymentMap
 
 func init() {
 	DeploymentMapInstance = &DeploymentMap{}
-}
-
-func (d DeploymentHandler) OnAdd(obj interface{}, isInInitialList bool) {
-	DeploymentMapInstance.Add(obj.(*v1.Deployment))
-}
-
-func (d DeploymentHandler) OnUpdate(oldObj, newObj interface{}) {
-	err := DeploymentMapInstance.Update(newObj.(*v1.Deployment))
-	if err != nil {
-		return
-	}
-}
-
-func (d DeploymentHandler) OnDelete(obj interface{}) {
-	DeploymentMapInstance.Delete(obj.(*v1.Deployment))
 }

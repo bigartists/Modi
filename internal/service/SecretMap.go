@@ -1,4 +1,4 @@
-package kind
+package service
 
 import (
 	"fmt"
@@ -6,9 +6,6 @@ import (
 	"sort"
 	"sync"
 )
-
-type SecretHandler struct {
-}
 
 type CoreV1Secret []*corev1.Secret
 
@@ -89,21 +86,6 @@ func (this *SecretMapStruct) ListAll() []*corev1.Secret {
 	sort.Sort(CoreV1Secret(ret)) //  按时间倒排序
 	return ret
 
-}
-
-func (this SecretHandler) OnAdd(obj interface{}, isInInitialList bool) {
-	SecretMapInstance.Add(obj.(*corev1.Secret))
-}
-
-func (this SecretHandler) OnUpdate(oldObj, newObj interface{}) {
-	err := SecretMapInstance.Update(newObj.(*corev1.Secret))
-	if err != nil {
-		return
-	}
-}
-
-func (this SecretHandler) OnDelete(obj interface{}) {
-	SecretMapInstance.Delete(obj.(*corev1.Secret))
 }
 
 var SecretMapInstance *SecretMapStruct
