@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/golang-jwt/jwt/v4"
 	"modi/config"
-	"modi/pkg/utils"
+	"modi/src/utils"
 	"time"
 )
 

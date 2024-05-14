@@ -2,9 +2,9 @@ package service
 
 import (
 	"fmt"
-	"modi/pkg/dao"
-	UserModel2 "modi/pkg/model/UserModel"
-	"modi/pkg/result"
+	"modi/src/dao"
+	UserModel2 "modi/src/model/UserModel"
+	"modi/src/result"
 )
 
 var UserServiceGetter IUser
