@@ -1,7 +1,7 @@
 package DeploymentModel
 
 import (
-	"modi/pkg/model/PodModel"
+	"modi/src/model/PodModel"
 )
 
 type DeploymentImpl struct {

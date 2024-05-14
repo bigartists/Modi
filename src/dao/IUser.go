@@ -1,7 +1,7 @@
 package dao
 
 import (
-	"modi/pkg/model/UserModel"
+	"modi/src/model/UserModel"
 )
 
 type IUserDao interface {

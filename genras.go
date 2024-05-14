@@ -2,7 +2,7 @@ package main
 
 import (
 	"log"
-	"modi/pkg/utils"
+	"modi/src/utils"
 )
 
 func main() {

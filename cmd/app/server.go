@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/cobra"
-	dbs "modi/pkg/dao"
-	"modi/pkg/listener"
-	middlewares "modi/pkg/middlewares"
-	"modi/pkg/routes"
-	"modi/pkg/validators"
+	dbs "modi/src/dao"
+	"modi/src/listener"
+	middlewares "modi/src/middlewares"
+	"modi/src/routes"
+	"modi/src/validators"
 )
 
 // 本函数用于初始化gin
