@@ -2,7 +2,7 @@ package result
 
 import (
 	"fmt"
-	"modi/pkg/validators"
+	"modi/src/validators"
 )
 
 type ErrorResult struct {

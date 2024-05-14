@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"github.com/gin-gonic/gin"
-	"modi/pkg/vars"
+	"modi/src/vars"
 	"sync"
 )
 

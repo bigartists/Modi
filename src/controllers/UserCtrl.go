@@ -2,8 +2,8 @@ package controllers
 
 import (
 	"github.com/gin-gonic/gin"
-	"modi/pkg/result"
-	"modi/pkg/service"
+	"modi/src/result"
+	"modi/src/service"
 )
 
 type UserController struct {

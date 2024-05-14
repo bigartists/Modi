@@ -1,7 +1,7 @@
 package service
 
 import (
-	"modi/pkg/result"
+	"modi/src/result"
 )
 
 type IDeployment interface {

@@ -2,9 +2,9 @@ package controllers
 
 import (
 	"github.com/gin-gonic/gin"
-	Model "modi/pkg/model/SecretModel"
-	"modi/pkg/result"
-	"modi/pkg/service"
+	Model "modi/src/model/SecretModel"
+	"modi/src/result"
+	"modi/src/service"
 	"net/http"
 )
 
