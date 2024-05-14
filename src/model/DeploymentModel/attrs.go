@@ -1,7 +1,7 @@
 package DeploymentModel
 
 import (
-	"modi/pkg/model/PodModel"
+	"modi/src/model/PodModel"
 )
 
 type DeploymentAttrFunc func(*DeploymentImpl)

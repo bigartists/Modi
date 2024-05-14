@@ -4,11 +4,11 @@ import (
 	"fmt"
 	v1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
-	"modi/pkg/model/DeploymentModel"
-	"modi/pkg/model/PodModel"
-	"modi/pkg/result"
+	"modi/src/model/DeploymentModel"
+	"modi/src/model/PodModel"
+	"modi/src/result"
 
-	"modi/pkg/utils"
+	"modi/src/utils"
 	"sort"
 )
 

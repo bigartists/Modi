@@ -2,7 +2,7 @@ package dao
 
 import (
 	"fmt"
-	"modi/pkg/model/UserModel"
+	"modi/src/model/UserModel"
 )
 
 var UserGetter IUserDao

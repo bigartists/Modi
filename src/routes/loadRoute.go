@@ -2,7 +2,7 @@ package routes
 
 import (
 	"github.com/gin-gonic/gin"
-	controllers2 "modi/pkg/controllers"
+	controllers2 "modi/src/controllers"
 )
 
 func Build(r *gin.Engine) {

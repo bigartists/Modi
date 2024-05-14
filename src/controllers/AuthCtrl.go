@@ -3,10 +3,10 @@ package controllers
 import (
 	"github.com/gin-gonic/gin"
 	"modi/config"
-	"modi/pkg/dto"
-	"modi/pkg/result"
-	"modi/pkg/service"
-	"modi/pkg/utils"
+	"modi/src/dto"
+	"modi/src/result"
+	"modi/src/service"
+	"modi/src/utils"
 	"time"
 )
 

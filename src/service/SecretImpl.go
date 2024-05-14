@@ -5,10 +5,10 @@ import (
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"modi/client"
-	"modi/pkg/model/SecretModel"
-	"modi/pkg/result"
+	"modi/src/model/SecretModel"
+	"modi/src/result"
 
-	"modi/pkg/utils"
+	"modi/src/utils"
 )
 
 var SecretServiceGetter ISecret

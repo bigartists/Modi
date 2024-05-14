@@ -7,7 +7,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"modi/client"
-	PodModel2 "modi/pkg/model/PodModel"
+	PodModel2 "modi/src/model/PodModel"
 	"sort"
 )
 
