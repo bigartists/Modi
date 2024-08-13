@@ -6,7 +6,7 @@ import (
 	"github.com/spf13/cobra"
 	dbs "modi/src/dao"
 	"modi/src/listener"
-	middlewares "modi/src/middlewares"
+	"modi/src/middlewares"
 	"modi/src/routes"
 	"modi/src/validators"
 )

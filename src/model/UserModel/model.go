@@ -13,7 +13,7 @@ type UserImpl struct {
 	//Username 用户名，创建自定义验证器： 长度在 6-20 之间，且不能重复，只能包含大小写字母，数字，下划线；第一个字符必须是字母；
 	Username string `json:"username" gorm:"column:username;unique" binding:"usernameValid"`
 	//Password 密码， 长度在 6-20 之间，只能包含字母，数字，下划线；
-	Password string `json:"password" gorm:"column:password" binding:"passwordValid"`
+	Password string `json:"-" gorm:"column:password" binding:"passwordValid"`
 	// admin 0 和 1
 	Admin int `json:"admin" gorm:"column:admin"`
 	// active 0 和 1

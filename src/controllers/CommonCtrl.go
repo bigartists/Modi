@@ -32,12 +32,12 @@ func init() {
 	}
 }
 
-type Output1 func(c *gin.Context, v interface{}) interface{}
+type Output func(c *gin.Context, v interface{}) interface{}
 
-type ResultFunc1 func(result interface{}, message string) func(output Output1) interface{}
+type ResultFunc func(result interface{}, message string) func(output Output) interface{}
 
-func ResultWrapper1(c *gin.Context) ResultFunc1 {
-	return func(result interface{}, message string) func(output Output1) interface{} {
+func ResultWrapper(c *gin.Context) ResultFunc {
+	return func(result interface{}, message string) func(output Output) interface{} {
 		r := ResultPool.Get().(*JSONResult)
 		defer ResultPool.Put(r)
 		r.Message = message
@@ -51,13 +51,13 @@ func ResultWrapper1(c *gin.Context) ResultFunc1 {
 		//	"token": token,
 		//}
 
-		return func(output Output1) interface{} {
+		return func(output Output) interface{} {
 			return output(c, r)
 		}
 	}
 }
 
-func OK1(c *gin.Context, v interface{}) interface{} {
+func OK(c *gin.Context, v interface{}) interface{} {
 	// 将v 转成 *JSONResult 类型
 	if r, ok := v.(*JSONResult); ok {
 		r.Code = vars.HTTPSUCCESS
@@ -67,7 +67,7 @@ func OK1(c *gin.Context, v interface{}) interface{} {
 	return nil
 }
 
-func Created1(c *gin.Context, v interface{}) interface{} {
+func Created(c *gin.Context, v interface{}) interface{} {
 	// 将v 转成 *JSONResult 类型
 	if r, ok := v.(*JSONResult); ok {
 		r.Code = vars.HTTPSUCCESS
@@ -77,7 +77,7 @@ func Created1(c *gin.Context, v interface{}) interface{} {
 	return nil
 }
 
-func Error1(c *gin.Context, v interface{}) interface{} {
+func Error(c *gin.Context, v interface{}) interface{} {
 	// 将v 转成 *JSONResult 类型
 	if r, ok := v.(*JSONResult); ok {
 		r.Code = vars.HTTPFAIL
@@ -89,7 +89,7 @@ func Error1(c *gin.Context, v interface{}) interface{} {
 	return nil
 }
 
-func Unauthorized1(c *gin.Context, v interface{}) interface{} {
+func Unauthorized(c *gin.Context, v interface{}) interface{} {
 	// 将v 转成 *JSONResult 类型
 	if r, ok := v.(*JSONResult); ok {
 		r.Code = vars.HTTPUNAUTHORIZED

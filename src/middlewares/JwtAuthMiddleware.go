@@ -31,7 +31,7 @@ func JwtAuthMiddleware() gin.HandlerFunc {
 		tokenString := c.GetHeader("Authorization")
 		if tokenString == "" || !strings.HasPrefix(tokenString, "Bearer ") {
 			//c.JSON(http.StatusUnauthorized, gin.H{"error": "jwt未获取"})
-			ret := controllers.ResultWrapper1(c)(nil, "未获取到jwt")(controllers.Unauthorized1)
+			ret := controllers.ResultWrapper(c)(nil, "未获取到jwt")(controllers.Unauthorized)
 			c.JSON(http.StatusUnauthorized, ret)
 			c.Abort()
 			return
@@ -57,6 +57,7 @@ func JwtAuthMiddleware() gin.HandlerFunc {
 				curTime := time.Now().Add(time.Second * 60 * 60 * 24)
 				token, _ := utils.GenerateToken(user.Id, prikey, curTime)
 
+				c.Set("auth_user", user)
 				c.Set("token", token)
 				c.Next()
 			}

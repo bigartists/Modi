@@ -1,13 +1,15 @@
 package service
 
 import (
+	"context"
 	"fmt"
+	"github.com/gin-gonic/gin"
 	v1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
+	"modi/client"
 	"modi/src/model/DeploymentModel"
 	"modi/src/model/PodModel"
 	"modi/src/result"
-
 	"modi/src/utils"
 	"sort"
 )
@@ -15,6 +17,24 @@ import (
 var DeploymentServiceGetter IDeployment
 
 type IDeploymentServiceGetterImpl struct {
+}
+
+func (I IDeploymentServiceGetterImpl) GetPodContainer(ns string, podName string) *result.ErrorResult {
+	podService := PodService{}
+	ret := podService.GetPodContainer(ns, podName)
+	return result.Result(ret, nil)
+}
+
+func (I IDeploymentServiceGetterImpl) GetPodLogs(c *gin.Context, ns string, podname string, cname string) *result.ErrorResult {
+
+	req := client.K8sClient.CoreV1().Pods(ns).GetLogs(podname, &corev1.PodLogOptions{
+		//Follow:    true,
+		Container: cname,
+	})
+	podLogs := req.Do(context.Background())
+	b, _ := podLogs.Raw()
+	//println(string(b))
+	return result.Result(string(b), nil)
 }
 
 func (I IDeploymentServiceGetterImpl) GetNs() *result.ErrorResult {
@@ -37,7 +57,6 @@ func (I IDeploymentServiceGetterImpl) GetPodJson(ns string, pod string) *result.
 	} else {
 		return result.Result(json, nil)
 	}
-
 }
 
 func (I IDeploymentServiceGetterImpl) GetPods(ns string, dname string) *result.ErrorResult {
@@ -70,6 +89,20 @@ func (I IDeploymentServiceGetterImpl) GetPods(ns string, dname string) *result.E
 	}
 }
 
+func (I IDeploymentServiceGetterImpl) GetPodDetail(ns string, pod string) *result.ErrorResult {
+	podDetail, err := PodMapInstance.GetDetail(ns, pod)
+	if err != nil {
+		return result.Result(nil, fmt.Errorf("GetPodDetail: record not found"))
+	} else {
+		//return result.Result(podDetail, nil)
+		pods := make([]*corev1.Pod, 0)
+		pods = append(pods, podDetail)
+		ret := RenderPods(pods)
+		return result.Result(ret[0], nil)
+
+	}
+}
+
 func (I IDeploymentServiceGetterImpl) GetDeploymentDetailByNsDName(ns string, dname string) *result.ErrorResult {
 	dep, err := DeploymentMapInstance.GetDeploymentByName(ns, dname)
 	if err != nil {
@@ -83,6 +116,7 @@ func (I IDeploymentServiceGetterImpl) GetDeploymentDetailByNsDName(ns string, dn
 			DeploymentModel.WithReplicas([3]int32{dep.Status.Replicas, dep.Status.AvailableReplicas, dep.Status.UnavailableReplicas}),
 			DeploymentModel.WithImages(GetImages(*dep)),
 			DeploymentModel.WithPods(GetPods(*dep, ns, dname)),
+			DeploymentModel.WithIsComplete(GetDeploymentIsComplete(dep)),
 		)
 		return result.Result(ret, nil)
 	}

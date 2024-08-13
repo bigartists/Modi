@@ -51,5 +51,12 @@ func InitInformerListener() {
 		return
 	}
 
+	// 初始化configMap 监听
+	configMapInformer := fact.Core().V1().ConfigMaps().Informer()
+	_, err = configMapInformer.AddEventHandler(&service.ConfigMapHandler{})
+	if err != nil {
+		return
+	}
+
 	fact.Start(wait.NeverStop)
 }

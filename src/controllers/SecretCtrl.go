@@ -28,13 +28,13 @@ func secretList(c *gin.Context) {
 		Namespace string `form:"ns"`
 	}{}
 	result.Result(c.ShouldBindQuery(namespace)).Unwrap()
-	ret := ResultWrapper1(c)(service.SecretServiceGetter.GetSecretByNs(namespace.Namespace).Unwrap(), "")(OK1)
+	ret := ResultWrapper(c)(service.SecretServiceGetter.GetSecretByNs(namespace.Namespace).Unwrap(), "")(OK)
 	c.JSON(http.StatusOK, ret)
 }
 
 func postSecret(c *gin.Context) {
 	postModel := &Model.PostSecretModel{}
 	result.Result(c.ShouldBindJSON(postModel))
-	ret := ResultWrapper1(c)(service.SecretServiceGetter.PostSecret(postModel, c).Unwrap(), "")(OK1)
+	ret := ResultWrapper(c)(service.SecretServiceGetter.PostSecret(postModel, c).Unwrap(), "")(OK)
 	c.JSON(http.StatusOK, ret)
 }

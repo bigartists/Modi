@@ -22,7 +22,7 @@ func (this *UserController) Build(r *gin.RouterGroup) {
 }
 
 func UserList(c *gin.Context) {
-	ret := ResultWrapper1(c)(service.UserServiceGetter.GetUserList(), "")(OK1)
+	ret := ResultWrapper(c)(service.UserServiceGetter.GetUserList(), "")(OK)
 	c.JSON(200, ret)
 }
 
@@ -31,7 +31,7 @@ func UserDetail(c *gin.Context) {
 		Id int64 `uri:"id" binding:"required"`
 	}{}
 	result.Result(c.ShouldBindUri(id)).Unwrap()
-	ret := ResultWrapper1(c)(service.UserServiceGetter.GetUserDetail(id.Id).Unwrap(), "")(OK1)
+	ret := ResultWrapper(c)(service.UserServiceGetter.GetUserDetail(id.Id).Unwrap(), "")(OK)
 	c.JSON(200, ret)
 }
 

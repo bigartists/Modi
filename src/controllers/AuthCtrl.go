@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"modi/config"
 	"modi/src/dto"
+	"modi/src/model/UserModel"
 	"modi/src/result"
 	"modi/src/service"
 	"modi/src/utils"
@@ -27,7 +28,7 @@ func (a *AuthController) Login(c *gin.Context) {
 
 	user, err := service.UserServiceGetter.SignIn(params.Username, params.Password)
 	if err != nil {
-		ret := ResultWrapper1(c)(nil, err.Error())(Error1)
+		ret := ResultWrapper(c)(nil, err.Error())(Error)
 		c.JSON(400, ret)
 	}
 
@@ -37,7 +38,7 @@ func (a *AuthController) Login(c *gin.Context) {
 	token, _ := utils.GenerateToken(user.Id, prikey, curTime)
 
 	c.Set("token", token)
-	ret := ResultWrapper1(c)(user, "")(OK1)
+	ret := ResultWrapper(c)(user, "")(OK)
 	c.JSON(200, ret)
 }
 
@@ -49,16 +50,31 @@ func (a *AuthController) SignUp(c *gin.Context) {
 
 	err := service.UserServiceGetter.SignUp(params.Email, params.Username, params.Password)
 	if err != nil {
-		ret := ResultWrapper1(c)(nil, err.Error())(Error1)
+		ret := ResultWrapper(c)(nil, err.Error())(Error)
 		c.JSON(400, ret)
 	}
-	ret := ResultWrapper1(c)(true, "")(Created1)
+	ret := ResultWrapper(c)(true, "")(Created)
 	c.JSON(201, ret)
+}
+
+func (a *AuthController) GetMe(c *gin.Context) {
+	u := GetAuthUser(c)
+	ret := ResultWrapper(c)(u, "")(OK)
+	c.JSON(200, ret)
+}
+
+func GetAuthUser(c *gin.Context) *UserModel.UserImpl {
+	t, exist := c.Get("auth_user")
+	if !exist {
+		panic("auth_user not found in gin context")
+	}
+	return t.(*UserModel.UserImpl)
 }
 
 func (a *AuthController) Build(r *gin.RouterGroup) {
 	r.POST("/login", a.Login)
 	r.POST("/register", a.SignUp)
+	r.GET("/me", a.GetMe)
 }
 
 //func SetUpAuthController(r *gin.Engine) {
