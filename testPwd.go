@@ -2,9 +2,9 @@ package main
 
 import (
 	"fmt"
+	"github.com/bigartists/Modi/src/model/UserModel"
 	"golang.org/x/crypto/bcrypt"
 	"log"
-	"modi/src/model/UserModel"
 )
 
 func main() {

@@ -11,8 +11,8 @@ var K8sClient *kubernetes.Clientset
 var K8sClientRestConfig *rest.Config
 
 func init() {
-	//kubeconfig := "etc/ai-stage.yaml"
-	kubeconfig := "etc/ai-dx-test.yaml"
+	kubeconfig := "etc/ai-stage.yaml"
+	//kubeconfig := "etc/ai-dx-test.yaml"
 	//kubeconfig := "etc/npu-910b-test.yaml"
 
 	config, err := clientcmd.BuildConfigFromFlags("", kubeconfig)

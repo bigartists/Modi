@@ -1,13 +1,13 @@
 package controllers
 
 import (
+	"github.com/bigartists/Modi/config"
+	"github.com/bigartists/Modi/src/dto"
+	"github.com/bigartists/Modi/src/model/UserModel"
+	"github.com/bigartists/Modi/src/result"
+	"github.com/bigartists/Modi/src/service"
+	"github.com/bigartists/Modi/src/utils"
 	"github.com/gin-gonic/gin"
-	"modi/config"
-	"modi/src/dto"
-	"modi/src/model/UserModel"
-	"modi/src/result"
-	"modi/src/service"
-	"modi/src/utils"
 	"time"
 )
 
@@ -76,9 +76,3 @@ func (a *AuthController) Build(r *gin.RouterGroup) {
 	r.POST("/register", a.SignUp)
 	r.GET("/me", a.GetMe)
 }
-
-//func SetUpAuthController(r *gin.Engine) {
-//	authController := NewAuthController()
-//	r.POST("/login", authController.Login)
-//	r.POST("/register", authController.SignUp)
-//}

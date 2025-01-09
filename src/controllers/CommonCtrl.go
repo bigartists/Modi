@@ -1,8 +1,8 @@
 package controllers
 
 import (
+	"github.com/bigartists/Modi/src/vars"
 	"github.com/gin-gonic/gin"
-	"modi/src/vars"
 	"sync"
 )
 

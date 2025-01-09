@@ -2,12 +2,22 @@ package service
 
 import (
 	"fmt"
-	"modi/src/dao"
-	UserModel2 "modi/src/model/UserModel"
-	"modi/src/result"
+	"github.com/bigartists/Modi/src/dao"
+	UserModel "github.com/bigartists/Modi/src/model/UserModel"
+	"github.com/bigartists/Modi/src/result"
 )
 
 var UserServiceGetter IUser
+
+type IUser interface {
+	GetUserList() []*UserModel.UserImpl
+	GetUserDetail(id int64) *result.ErrorResult
+	CreateUser(user *UserModel.UserImpl) *result.ErrorResult
+	UpdateUser(id int, user *UserModel.UserImpl) *result.ErrorResult
+	DeleteUser(id int) *result.ErrorResult
+	SignIn(username string, password string) (*UserModel.UserImpl, error)
+	SignUp(email string, username string, password string) error
+}
 
 func init() {
 	UserServiceGetter = NewIUserGetterImpl()
@@ -20,7 +30,7 @@ func NewIUserGetterImpl() *IUserServiceGetterImpl {
 type IUserServiceGetterImpl struct {
 }
 
-func (this *IUserServiceGetterImpl) SignIn(username string, password string) (*UserModel2.UserImpl, error) {
+func (this *IUserServiceGetterImpl) SignIn(username string, password string) (*UserModel.UserImpl, error) {
 	user, err := dao.UserGetter.FindUserByUsername(username)
 	if err != nil {
 		return nil, err
@@ -47,7 +57,7 @@ func (this *IUserServiceGetterImpl) SignUp(email string, username string, passwo
 		return fmt.Errorf("邮箱%s已存在", email)
 	}
 
-	user := UserModel2.New(UserModel2.WithEmail(email), UserModel2.WithUsername(username), UserModel2.WithPassword(password))
+	user := UserModel.New(UserModel.WithEmail(email), UserModel.WithUsername(username), UserModel.WithPassword(password))
 	err := user.GeneratePassword()
 	if err != nil {
 		return fmt.Errorf("密码加密失败")
@@ -61,14 +71,14 @@ func (this *IUserServiceGetterImpl) SignUp(email string, username string, passwo
 	return nil
 }
 
-func (this *IUserServiceGetterImpl) GetUserList() []*UserModel2.UserImpl {
+func (this *IUserServiceGetterImpl) GetUserList() []*UserModel.UserImpl {
 	users := dao.UserGetter.FindUserAll()
 	return users
 }
 
 func (this *IUserServiceGetterImpl) GetUserDetail(id int64) *result.ErrorResult {
 	//TODO implement me
-	user := UserModel2.New()
+	user := UserModel.New()
 	_, err := dao.UserGetter.FindUserById(id, user)
 	if err != nil {
 		return result.Result(nil, err)
@@ -76,12 +86,12 @@ func (this *IUserServiceGetterImpl) GetUserDetail(id int64) *result.ErrorResult 
 	return result.Result(user, nil)
 }
 
-func (this *IUserServiceGetterImpl) CreateUser(user *UserModel2.UserImpl) *result.ErrorResult {
+func (this *IUserServiceGetterImpl) CreateUser(user *UserModel.UserImpl) *result.ErrorResult {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (this *IUserServiceGetterImpl) UpdateUser(id int, user *UserModel2.UserImpl) *result.ErrorResult {
+func (this *IUserServiceGetterImpl) UpdateUser(id int, user *UserModel.UserImpl) *result.ErrorResult {
 	//TODO implement me
 	panic("implement me")
 }

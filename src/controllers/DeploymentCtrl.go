@@ -1,13 +1,14 @@
 package controllers
 
 import (
+	"github.com/bigartists/Modi/client"
+	"github.com/bigartists/Modi/src/handler"
+	"github.com/bigartists/Modi/src/result"
+	"github.com/bigartists/Modi/src/service"
 	"github.com/gin-gonic/gin"
 	"io"
 	corev1 "k8s.io/api/core/v1"
 	"log"
-	"modi/client"
-	"modi/src/result"
-	"modi/src/service"
 	"net/http"
 )
 
@@ -19,7 +20,8 @@ func NewDeploymentHandler() *DeploymentController {
 }
 
 func (this *DeploymentController) Build(r *gin.RouterGroup) {
-	r.GET("/deployments", deploymentList) // /modi/v1/deployments?ns=infra
+	//r.GET("/deployments", deploymentList) // /modi/v1/deployments?ns=infra
+	r.GET("/deployments", deploymentList2) // /modi/v1/deployments?ns=infra
 	r.GET("/deployment", deploymentDetail)
 	r.POST("/deployment/update/scale", incrReplicas)
 	r.GET("/pod/json", podJson)
@@ -147,6 +149,17 @@ func deploymentList(c *gin.Context) {
 	result.Result(c.ShouldBindQuery(namespace)).Unwrap()
 	ret := ResultWrapper(c)(service.DeploymentServiceGetter.GetDeploymentsByNs(namespace.Namespace).Unwrap(), "")(OK)
 	c.JSON(http.StatusOK, ret)
+}
+
+func deploymentList2(c *gin.Context) {
+	namespace := &struct {
+		Namespace string `form:"ns"`
+	}{}
+	if handler.BindAndCheck(c, namespace) {
+		return
+	}
+	ret, err := service.DeploymentServiceGetter.GetDeploymentsByNs2(namespace.Namespace)
+	handler.HandleResponse(c, err, ret)
 }
 
 func pods(c *gin.Context) {

@@ -1,6 +1,6 @@
 package service
 
-import "modi/src/model"
+import "github.com/bigartists/Modi/src/model"
 
 type PodService struct {
 }

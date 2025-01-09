@@ -2,8 +2,8 @@ package main
 
 import (
 	"context"
+	"github.com/bigartists/Modi/client"
 	v1 "k8s.io/api/core/v1"
-	"modi/client"
 )
 
 func main() {

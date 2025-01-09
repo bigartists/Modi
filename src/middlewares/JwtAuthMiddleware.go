@@ -2,14 +2,14 @@ package middlewares
 
 import (
 	"fmt"
+	"github.com/bigartists/Modi/config"
+	"github.com/bigartists/Modi/src/controllers"
+	"github.com/bigartists/Modi/src/dao"
+	"github.com/bigartists/Modi/src/model/UserModel"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"
-	"modi/config"
-	"modi/src/controllers"
-	"modi/src/dao"
-	"modi/src/model/UserModel"
 
-	"modi/src/utils"
+	"github.com/bigartists/Modi/src/utils"
 	"net/http"
 	"strings"
 	"time"
@@ -22,6 +22,7 @@ func JwtAuthMiddleware() gin.HandlerFunc {
 		exceptPaths := map[string]bool{
 			"/modi/v1/login":    true,
 			"/modi/v1/register": true,
+			"/modi/v1/test":     true,
 		}
 		// 如果请求路径在白名单中，则不进行JWT验证，直接继续处理请求
 		if _, ok := exceptPaths[path]; ok {

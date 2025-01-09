@@ -1,9 +1,9 @@
 package service
 
 import (
+	"github.com/bigartists/Modi/src/helpers"
+	"github.com/bigartists/Modi/src/result"
 	corev1 "k8s.io/api/core/v1"
-	"modi/src/helpers"
-	"modi/src/result"
 	"sort"
 	"sync"
 )

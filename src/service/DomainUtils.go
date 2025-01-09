@@ -3,11 +3,11 @@ package service
 import (
 	"context"
 	"fmt"
+	"github.com/bigartists/Modi/client"
+	PodModel2 "github.com/bigartists/Modi/src/model/PodModel"
 	v1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"modi/client"
-	PodModel2 "modi/src/model/PodModel"
 	"sort"
 )
 

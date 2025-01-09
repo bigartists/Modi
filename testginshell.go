@@ -1,12 +1,12 @@
 package main
 
 import (
+	"github.com/bigartists/Modi/client"
+	"github.com/bigartists/Modi/src/helpers"
+	"github.com/bigartists/Modi/src/wscore"
 	"github.com/gin-gonic/gin"
 	"k8s.io/client-go/tools/remotecommand"
 	"log"
-	"modi/client"
-	"modi/src/helpers"
-	"modi/src/wscore"
 )
 
 func main() {

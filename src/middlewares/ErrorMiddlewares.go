@@ -1,8 +1,8 @@
 package middlewares
 
 import (
+	"github.com/bigartists/Modi/src/controllers"
 	"github.com/gin-gonic/gin"
-	"modi/src/controllers"
 )
 
 func ErrorHandler() gin.HandlerFunc {

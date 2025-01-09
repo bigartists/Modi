@@ -1,10 +1,10 @@
 package dao
 
 import (
+	"github.com/bigartists/Modi/config"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"log"
-	"modi/config"
 	"time"
 )
 

@@ -1,9 +1,9 @@
 package controllers
 
 import (
+	"github.com/bigartists/Modi/src/result"
+	"github.com/bigartists/Modi/src/service"
 	"github.com/gin-gonic/gin"
-	"modi/src/result"
-	"modi/src/service"
 	"net/http"
 )
 

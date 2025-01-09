@@ -1,10 +1,10 @@
 package controllers
 
 import (
+	Model "github.com/bigartists/Modi/src/model/SecretModel"
+	"github.com/bigartists/Modi/src/result"
+	"github.com/bigartists/Modi/src/service"
 	"github.com/gin-gonic/gin"
-	Model "modi/src/model/SecretModel"
-	"modi/src/result"
-	"modi/src/service"
 	"net/http"
 )
 

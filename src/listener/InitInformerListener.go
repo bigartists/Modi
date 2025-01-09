@@ -1,10 +1,10 @@
 package listener
 
 import (
+	"github.com/bigartists/Modi/client"
+	"github.com/bigartists/Modi/src/service"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/informers"
-	"modi/client"
-	"modi/src/service"
 )
 
 func InitInformerListener() {

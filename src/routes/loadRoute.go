@@ -1,8 +1,8 @@
 package routes
 
 import (
+	controllers "github.com/bigartists/Modi/src/controllers"
 	"github.com/gin-gonic/gin"
-	controllers "modi/src/controllers"
 )
 
 func Build(r *gin.Engine) {

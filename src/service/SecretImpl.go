@@ -1,17 +1,22 @@
 package service
 
 import (
+	"github.com/bigartists/Modi/client"
+	"github.com/bigartists/Modi/src/model/SecretModel"
+	"github.com/bigartists/Modi/src/result"
 	"github.com/gin-gonic/gin"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"modi/client"
-	"modi/src/model/SecretModel"
-	"modi/src/result"
 
-	"modi/src/utils"
+	"github.com/bigartists/Modi/src/utils"
 )
 
 var SecretServiceGetter ISecret
+
+type ISecret interface {
+	GetSecretByNs(ns string) *result.ErrorResult
+	PostSecret(secret *SecretModel.PostSecretModel, c *gin.Context) *result.ErrorResult
+}
 
 type ISecretServiceGetterImpl struct {
 }
