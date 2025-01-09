@@ -1,10 +1,10 @@
 package controllers
 
 import (
+	Model "github.com/bigartists/Modi/src/model/SecretModel"
+	"github.com/bigartists/Modi/src/result"
+	"github.com/bigartists/Modi/src/service"
 	"github.com/gin-gonic/gin"
-	Model "modi/src/model/SecretModel"
-	"modi/src/result"
-	"modi/src/service"
 	"net/http"
 )
 
@@ -28,13 +28,13 @@ func secretList(c *gin.Context) {
 		Namespace string `form:"ns"`
 	}{}
 	result.Result(c.ShouldBindQuery(namespace)).Unwrap()
-	ret := ResultWrapper1(c)(service.SecretServiceGetter.GetSecretByNs(namespace.Namespace).Unwrap(), "")(OK1)
+	ret := ResultWrapper(c)(service.SecretServiceGetter.GetSecretByNs(namespace.Namespace).Unwrap(), "")(OK)
 	c.JSON(http.StatusOK, ret)
 }
 
 func postSecret(c *gin.Context) {
 	postModel := &Model.PostSecretModel{}
 	result.Result(c.ShouldBindJSON(postModel))
-	ret := ResultWrapper1(c)(service.SecretServiceGetter.PostSecret(postModel, c).Unwrap(), "")(OK1)
+	ret := ResultWrapper(c)(service.SecretServiceGetter.PostSecret(postModel, c).Unwrap(), "")(OK)
 	c.JSON(http.StatusOK, ret)
 }

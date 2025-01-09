@@ -1,9 +1,10 @@
 package controllers
 
 import (
+	"github.com/bigartists/Modi/src/handler"
+	"github.com/bigartists/Modi/src/result"
+	"github.com/bigartists/Modi/src/service"
 	"github.com/gin-gonic/gin"
-	"modi/src/result"
-	"modi/src/service"
 )
 
 type UserController struct {
@@ -19,10 +20,11 @@ func NewUserHandler() *UserController {
 func (this *UserController) Build(r *gin.RouterGroup) {
 	r.GET("/users", UserList)
 	r.GET("/user/:id", UserDetail)
+	r.POST("/test", Test)
 }
 
 func UserList(c *gin.Context) {
-	ret := ResultWrapper1(c)(service.UserServiceGetter.GetUserList(), "")(OK1)
+	ret := ResultWrapper(c)(service.UserServiceGetter.GetUserList(), "")(OK)
 	c.JSON(200, ret)
 }
 
@@ -31,13 +33,22 @@ func UserDetail(c *gin.Context) {
 		Id int64 `uri:"id" binding:"required"`
 	}{}
 	result.Result(c.ShouldBindUri(id)).Unwrap()
-	ret := ResultWrapper1(c)(service.UserServiceGetter.GetUserDetail(id.Id).Unwrap(), "")(OK1)
+	ret := ResultWrapper(c)(service.UserServiceGetter.GetUserDetail(id.Id).Unwrap(), "")(OK)
 	c.JSON(200, ret)
 }
 
-//
-//func UserSave(c *gin.Context) {
-//	u := UserModel.New()
-//	result.Result(c.ShouldBindJSON(u)).Unwrap()
-//	ResultWrapper(c)("save user", "10086", "true")(OK)
-//}
+type TestUserReq struct {
+	ID          string `validate:"required" json:"id"`
+	UserID      string `json:"-"`
+	CanDelete   bool   `json:"-"`
+	CaptchaID   string `json:"captcha_id"`
+	CaptchaCode string `json:"captcha_code"`
+}
+
+func Test(c *gin.Context) {
+	req := &TestUserReq{}
+	if handler.BindAndCheck(c, req) {
+		return
+	}
+	handler.HandleResponse(c, nil, "success")
+}

@@ -133,3 +133,19 @@ func (this SecretHandler) OnUpdate(oldObj, newObj interface{}) {
 func (this SecretHandler) OnDelete(obj interface{}) {
 	SecretMapInstance.Delete(obj.(*corev1.Secret))
 }
+
+type ConfigMapHandler struct {
+}
+
+func (this *ConfigMapHandler) OnAdd(obj interface{}, isInInitialList bool) {
+	ConfigMapInstance.Add(obj.(*corev1.ConfigMap))
+}
+func (this *ConfigMapHandler) OnUpdate(oldObj, newObj interface{}) {
+	err := ConfigMapInstance.Update(newObj.(*corev1.ConfigMap))
+	if err == false {
+		return
+	}
+}
+func (this *ConfigMapHandler) OnDelete(obj interface{}) {
+	ConfigMapInstance.Delete(obj.(*corev1.ConfigMap))
+}

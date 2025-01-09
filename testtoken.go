@@ -2,9 +2,9 @@ package main
 
 import (
 	"fmt"
+	"github.com/bigartists/Modi/config"
+	"github.com/bigartists/Modi/src/utils"
 	"github.com/golang-jwt/jwt/v4"
-	"modi/config"
-	"modi/src/utils"
 	"time"
 )
 

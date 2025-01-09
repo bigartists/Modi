@@ -2,9 +2,9 @@ package main
 
 import (
 	"fmt"
-	"modi/cmd/app"
-	"modi/config"
-	_ "modi/config"
+	"github.com/bigartists/Modi/cmd/app"
+	"github.com/bigartists/Modi/config"
+	_ "github.com/bigartists/Modi/config"
 )
 
 func main() {

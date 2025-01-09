@@ -2,14 +2,14 @@ package middlewares
 
 import (
 	"fmt"
+	"github.com/bigartists/Modi/config"
+	"github.com/bigartists/Modi/src/controllers"
+	"github.com/bigartists/Modi/src/dao"
+	"github.com/bigartists/Modi/src/model/UserModel"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"
-	"modi/config"
-	"modi/src/controllers"
-	"modi/src/dao"
-	"modi/src/model/UserModel"
 
-	"modi/src/utils"
+	"github.com/bigartists/Modi/src/utils"
 	"net/http"
 	"strings"
 	"time"
@@ -22,6 +22,7 @@ func JwtAuthMiddleware() gin.HandlerFunc {
 		exceptPaths := map[string]bool{
 			"/modi/v1/login":    true,
 			"/modi/v1/register": true,
+			"/modi/v1/test":     true,
 		}
 		// 如果请求路径在白名单中，则不进行JWT验证，直接继续处理请求
 		if _, ok := exceptPaths[path]; ok {
@@ -31,7 +32,7 @@ func JwtAuthMiddleware() gin.HandlerFunc {
 		tokenString := c.GetHeader("Authorization")
 		if tokenString == "" || !strings.HasPrefix(tokenString, "Bearer ") {
 			//c.JSON(http.StatusUnauthorized, gin.H{"error": "jwt未获取"})
-			ret := controllers.ResultWrapper1(c)(nil, "未获取到jwt")(controllers.Unauthorized1)
+			ret := controllers.ResultWrapper(c)(nil, "未获取到jwt")(controllers.Unauthorized)
 			c.JSON(http.StatusUnauthorized, ret)
 			c.Abort()
 			return
@@ -57,6 +58,7 @@ func JwtAuthMiddleware() gin.HandlerFunc {
 				curTime := time.Now().Add(time.Second * 60 * 60 * 24)
 				token, _ := utils.GenerateToken(user.Id, prikey, curTime)
 
+				c.Set("auth_user", user)
 				c.Set("token", token)
 				c.Next()
 			}

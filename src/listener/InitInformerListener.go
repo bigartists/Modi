@@ -1,10 +1,10 @@
 package listener
 
 import (
+	"github.com/bigartists/Modi/client"
+	"github.com/bigartists/Modi/src/service"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/informers"
-	"modi/client"
-	"modi/src/service"
 )
 
 func InitInformerListener() {
@@ -47,6 +47,13 @@ func InitInformerListener() {
 	// 初始化 secret 监听
 	secretInformer := fact.Core().V1().Secrets().Informer()
 	_, err = secretInformer.AddEventHandler(&service.SecretHandler{})
+	if err != nil {
+		return
+	}
+
+	// 初始化configMap 监听
+	configMapInformer := fact.Core().V1().ConfigMaps().Informer()
+	_, err = configMapInformer.AddEventHandler(&service.ConfigMapHandler{})
 	if err != nil {
 		return
 	}

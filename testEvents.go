@@ -3,9 +3,9 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/bigartists/Modi/client"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"log"
-	"modi/client"
 )
 
 func main() {

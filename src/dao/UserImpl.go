@@ -2,10 +2,20 @@ package dao
 
 import (
 	"fmt"
-	"modi/src/model/UserModel"
+	"github.com/bigartists/Modi/src/model/UserModel"
 )
 
 var UserGetter IUserDao
+
+type IUserDao interface {
+	FindUserAll() []*UserModel.UserImpl
+	FindUserById(id int64, user *UserModel.UserImpl) (*UserModel.UserImpl, error)
+	FindUserByUsername(username string) (*UserModel.UserImpl, error)
+	FindUserByEmail(email string) (*UserModel.UserImpl, error)
+	CreateUser(user *UserModel.UserImpl) error
+	UpdateUser(id int, user *UserModel.UserImpl) error
+	DeleteUser(id int) error
+}
 
 func init() {
 	UserGetter = NewIUserDaoImpl()

@@ -1,20 +1,54 @@
 package service
 
 import (
+	"context"
 	"fmt"
+	"github.com/bigartists/Modi/client"
+	"github.com/bigartists/Modi/src/model/DeploymentModel"
+	"github.com/bigartists/Modi/src/model/PodModel"
+	"github.com/bigartists/Modi/src/result"
+	"github.com/bigartists/Modi/src/utils"
+	"github.com/gin-gonic/gin"
 	v1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
-	"modi/src/model/DeploymentModel"
-	"modi/src/model/PodModel"
-	"modi/src/result"
-
-	"modi/src/utils"
 	"sort"
 )
 
 var DeploymentServiceGetter IDeployment
 
+type IDeployment interface {
+	GetDeploymentsByNs(ns string) *result.ErrorResult
+	GetDeploymentsByNs2(ns string) (interface{}, error)
+	IncrReplicas(ns string, dep string, dec bool) *result.ErrorResult
+	GetDeploymentDetailByNsDName(ns string, dep string) *result.ErrorResult
+	GetPods(ns string, dep string) *result.ErrorResult
+	GetPodJson(ns string, pod string) *result.ErrorResult
+	GetPodDetail(ns string, pod string) *result.ErrorResult
+	DeletePod(ns string, pod string) *result.ErrorResult
+	GetNs() *result.ErrorResult
+	GetPodLogs(c *gin.Context, ns string, pod string, cname string) *result.ErrorResult
+	GetPodContainer(ns string, podName string) *result.ErrorResult
+}
+
 type IDeploymentServiceGetterImpl struct {
+}
+
+func (I IDeploymentServiceGetterImpl) GetPodContainer(ns string, podName string) *result.ErrorResult {
+	podService := PodService{}
+	ret := podService.GetPodContainer(ns, podName)
+	return result.Result(ret, nil)
+}
+
+func (I IDeploymentServiceGetterImpl) GetPodLogs(c *gin.Context, ns string, podname string, cname string) *result.ErrorResult {
+
+	req := client.K8sClient.CoreV1().Pods(ns).GetLogs(podname, &corev1.PodLogOptions{
+		//Follow:    true,
+		Container: cname,
+	})
+	podLogs := req.Do(context.Background())
+	b, _ := podLogs.Raw()
+	//println(string(b))
+	return result.Result(string(b), nil)
 }
 
 func (I IDeploymentServiceGetterImpl) GetNs() *result.ErrorResult {
@@ -37,7 +71,6 @@ func (I IDeploymentServiceGetterImpl) GetPodJson(ns string, pod string) *result.
 	} else {
 		return result.Result(json, nil)
 	}
-
 }
 
 func (I IDeploymentServiceGetterImpl) GetPods(ns string, dname string) *result.ErrorResult {
@@ -70,6 +103,20 @@ func (I IDeploymentServiceGetterImpl) GetPods(ns string, dname string) *result.E
 	}
 }
 
+func (I IDeploymentServiceGetterImpl) GetPodDetail(ns string, pod string) *result.ErrorResult {
+	podDetail, err := PodMapInstance.GetDetail(ns, pod)
+	if err != nil {
+		return result.Result(nil, fmt.Errorf("GetPodDetail: record not found"))
+	} else {
+		//return result.Result(podDetail, nil)
+		pods := make([]*corev1.Pod, 0)
+		pods = append(pods, podDetail)
+		ret := RenderPods(pods)
+		return result.Result(ret[0], nil)
+
+	}
+}
+
 func (I IDeploymentServiceGetterImpl) GetDeploymentDetailByNsDName(ns string, dname string) *result.ErrorResult {
 	dep, err := DeploymentMapInstance.GetDeploymentByName(ns, dname)
 	if err != nil {
@@ -83,6 +130,7 @@ func (I IDeploymentServiceGetterImpl) GetDeploymentDetailByNsDName(ns string, dn
 			DeploymentModel.WithReplicas([3]int32{dep.Status.Replicas, dep.Status.AvailableReplicas, dep.Status.UnavailableReplicas}),
 			DeploymentModel.WithImages(GetImages(*dep)),
 			DeploymentModel.WithPods(GetPods(*dep, ns, dname)),
+			DeploymentModel.WithIsComplete(GetDeploymentIsComplete(dep)),
 		)
 		return result.Result(ret, nil)
 	}
@@ -108,7 +156,6 @@ func (I IDeploymentServiceGetterImpl) GetDeploymentsByNs(ns string) *result.Erro
 		var ret []*DeploymentModel.DeploymentImpl
 		sortList := CoreV1Deployments(list)
 		sort.Sort(sortList)
-
 		for _, item := range sortList {
 			ret = append(ret, DeploymentModel.New(
 				DeploymentModel.WithName(item.Name),
@@ -121,6 +168,39 @@ func (I IDeploymentServiceGetterImpl) GetDeploymentsByNs(ns string) *result.Erro
 			))
 		}
 		return result.Result(ret, nil)
+	}
+}
+
+func (I IDeploymentServiceGetterImpl) GetDeploymentsByNs2(ns string) (interface{}, error) {
+	var list []*v1.Deployment
+	var err error
+	if ns == "" {
+		list, err = DeploymentMapInstance.GetAllDeployment()
+	} else {
+		list, err = DeploymentMapInstance.GetDeploymentsByNs(ns)
+	}
+
+	if err != nil {
+		//return result.Result(nil, fmt.Errorf("record not found"))
+		return nil, fmt.Errorf("record not found")
+	} else {
+		var ret []*DeploymentModel.DeploymentImpl
+		sortList := CoreV1Deployments(list)
+		sort.Sort(sortList)
+
+		for _, item := range sortList {
+			ret = append(ret, DeploymentModel.New(
+				DeploymentModel.WithName(item.Name),
+				DeploymentModel.WithNamespace(item.Namespace),
+				DeploymentModel.WithCreateTime(utils.FormatTime(item.CreationTimestamp)),
+				DeploymentModel.WithReplicas([3]int32{item.Status.Replicas, item.Status.AvailableReplicas, item.Status.UnavailableReplicas}),
+				DeploymentModel.WithImages(GetImages(*item)),
+				DeploymentModel.WithIsComplete(GetDeploymentIsComplete(item)),
+				DeploymentModel.WithMessage(GetDeploymentCondition(item)),
+			))
+		}
+		//return result.Result(ret, nil)
+		return ret, nil
 	}
 }
 

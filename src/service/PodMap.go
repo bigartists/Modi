@@ -20,6 +20,17 @@ func (this *PodMapStruct) Add(pod *corev1.Pod) {
 	}
 }
 
+func (this *PodMapStruct) Get(ns string, podName string) *corev1.Pod {
+	if list, ok := this.data.Load(ns); ok {
+		for _, pod := range list.([]*corev1.Pod) {
+			if pod.Name == podName {
+				return pod
+			}
+		}
+	}
+	return nil
+}
+
 func (this *PodMapStruct) Update(pod *corev1.Pod) error {
 	if list, ok := this.data.Load(pod.Namespace); ok {
 		for i, range_pod := range list.([]*corev1.Pod) {

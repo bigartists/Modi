@@ -2,13 +2,13 @@ package app
 
 import (
 	"fmt"
+	dbs "github.com/bigartists/Modi/src/dao"
+	"github.com/bigartists/Modi/src/listener"
+	"github.com/bigartists/Modi/src/middlewares"
+	"github.com/bigartists/Modi/src/routes"
+	"github.com/bigartists/Modi/src/validators"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/cobra"
-	dbs "modi/src/dao"
-	"modi/src/listener"
-	middlewares "modi/src/middlewares"
-	"modi/src/routes"
-	"modi/src/validators"
 )
 
 // 本函数用于初始化gin

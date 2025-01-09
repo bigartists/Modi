@@ -1,8 +1,8 @@
 package main
 
 import (
+	"github.com/bigartists/Modi/src/utils"
 	"log"
-	"modi/src/utils"
 )
 
 func main() {

@@ -3,9 +3,9 @@ package main
 import (
 	"context"
 	"fmt"
+	client2 "github.com/bigartists/Modi/client"
 	"io"
 	v1 "k8s.io/api/core/v1"
-	client2 "modi/client"
 )
 
 func main() {
