@@ -115,37 +115,3 @@ func (p PodHandler) OnDelete(obj interface{}) {
 		PodMapInstance.Delete(d)
 	}
 }
-
-type SecretHandler struct {
-}
-
-func (this SecretHandler) OnAdd(obj interface{}, isInInitialList bool) {
-	SecretMapInstance.Add(obj.(*corev1.Secret))
-}
-
-func (this SecretHandler) OnUpdate(oldObj, newObj interface{}) {
-	err := SecretMapInstance.Update(newObj.(*corev1.Secret))
-	if err != nil {
-		return
-	}
-}
-
-func (this SecretHandler) OnDelete(obj interface{}) {
-	SecretMapInstance.Delete(obj.(*corev1.Secret))
-}
-
-type ConfigMapHandler struct {
-}
-
-func (this *ConfigMapHandler) OnAdd(obj interface{}, isInInitialList bool) {
-	ConfigMapInstance.Add(obj.(*corev1.ConfigMap))
-}
-func (this *ConfigMapHandler) OnUpdate(oldObj, newObj interface{}) {
-	err := ConfigMapInstance.Update(newObj.(*corev1.ConfigMap))
-	if err == false {
-		return
-	}
-}
-func (this *ConfigMapHandler) OnDelete(obj interface{}) {
-	ConfigMapInstance.Delete(obj.(*corev1.ConfigMap))
-}

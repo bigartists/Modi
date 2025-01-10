@@ -2,12 +2,10 @@ package service
 
 import (
 	"fmt"
-	"github.com/bigartists/Modi/src/dao"
 	UserModel "github.com/bigartists/Modi/src/model/UserModel"
+	"github.com/bigartists/Modi/src/repo"
 	"github.com/bigartists/Modi/src/result"
 )
-
-var UserServiceGetter IUser
 
 type IUser interface {
 	GetUserList() []*UserModel.UserImpl
@@ -19,19 +17,16 @@ type IUser interface {
 	SignUp(email string, username string, password string) error
 }
 
-func init() {
-	UserServiceGetter = NewIUserGetterImpl()
-}
-
-func NewIUserGetterImpl() *IUserServiceGetterImpl {
-	return &IUserServiceGetterImpl{}
-}
-
 type IUserServiceGetterImpl struct {
+	userRepo repo.IUserRepo
+}
+
+func NewUserServiceImpl(userRepo repo.IUserRepo) *IUserServiceGetterImpl {
+	return &IUserServiceGetterImpl{userRepo: userRepo}
 }
 
 func (this *IUserServiceGetterImpl) SignIn(username string, password string) (*UserModel.UserImpl, error) {
-	user, err := dao.UserGetter.FindUserByUsername(username)
+	user, err := this.userRepo.FindUserByUsername(username)
 	if err != nil {
 		return nil, err
 	}
@@ -48,12 +43,12 @@ func (this *IUserServiceGetterImpl) SignIn(username string, password string) (*U
 }
 
 func (this *IUserServiceGetterImpl) SignUp(email string, username string, password string) error {
-	//return dao.UserGetter.CreateUser(user)
+	//return repo.UserGetter.CreateUser(user)
 
-	if _, err := dao.UserGetter.FindUserByUsername(username); err != nil {
+	if _, err := this.userRepo.FindUserByUsername(username); err != nil {
 		return fmt.Errorf("用户名%s已存在", username)
 	}
-	if _, err := dao.UserGetter.FindUserByEmail(email); err != nil {
+	if _, err := this.userRepo.FindUserByEmail(email); err != nil {
 		return fmt.Errorf("邮箱%s已存在", email)
 	}
 
@@ -62,7 +57,7 @@ func (this *IUserServiceGetterImpl) SignUp(email string, username string, passwo
 	if err != nil {
 		return fmt.Errorf("密码加密失败")
 	}
-	err = dao.UserGetter.CreateUser(user)
+	err = this.userRepo.CreateUser(user)
 
 	if err != nil {
 		return fmt.Errorf("用户注册失败")
@@ -72,14 +67,14 @@ func (this *IUserServiceGetterImpl) SignUp(email string, username string, passwo
 }
 
 func (this *IUserServiceGetterImpl) GetUserList() []*UserModel.UserImpl {
-	users := dao.UserGetter.FindUserAll()
+	users := this.userRepo.FindUserAll()
 	return users
 }
 
 func (this *IUserServiceGetterImpl) GetUserDetail(id int64) *result.ErrorResult {
 	//TODO implement me
 	user := UserModel.New()
-	_, err := dao.UserGetter.FindUserById(id, user)
+	_, err := this.userRepo.FindUserById(id, user)
 	if err != nil {
 		return result.Result(nil, err)
 	}

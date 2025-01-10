@@ -11,13 +11,15 @@ import (
 	"time"
 )
 
-type AuthController struct{}
-
-func NewAuthController() *AuthController {
-	return &AuthController{}
+type AuthController struct {
+	userService *service.IUserServiceGetterImpl
 }
 
-func (a *AuthController) Login(c *gin.Context) {
+func NewAuthController(userService *service.IUserServiceGetterImpl) *AuthController {
+	return &AuthController{userService: userService}
+}
+
+func (this *AuthController) Login(c *gin.Context) {
 	// 校验输入参数是否合法
 	params := &struct {
 		Username string `json:"username" binding:"required"`
@@ -26,7 +28,7 @@ func (a *AuthController) Login(c *gin.Context) {
 	// 校验参数
 	result.Result(c.ShouldBindJSON(params)).Unwrap()
 
-	user, err := service.UserServiceGetter.SignIn(params.Username, params.Password)
+	user, err := this.userService.SignIn(params.Username, params.Password)
 	if err != nil {
 		ret := ResultWrapper(c)(nil, err.Error())(Error)
 		c.JSON(400, ret)
@@ -48,7 +50,7 @@ func (a *AuthController) SignUp(c *gin.Context) {
 	// 校验参数
 	result.Result(c.ShouldBindJSON(params)).Unwrap()
 
-	err := service.UserServiceGetter.SignUp(params.Email, params.Username, params.Password)
+	err := a.userService.SignUp(params.Email, params.Username, params.Password)
 	if err != nil {
 		ret := ResultWrapper(c)(nil, err.Error())(Error)
 		c.JSON(400, ret)

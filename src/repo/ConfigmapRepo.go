@@ -1,4 +1,4 @@
-package service
+package repo
 
 import (
 	"github.com/bigartists/Modi/src/helpers"
@@ -12,6 +12,14 @@ type cm struct {
 	cmdata *corev1.ConfigMap
 	md5    string //对cm的data进行md5存储，防止过度更新
 }
+
+func newcm(c *corev1.ConfigMap) *cm {
+	return &cm{
+		cmdata: c, //原始对象
+		md5:    helpers.Md5Data(c.Data),
+	}
+}
+
 type CoreV1ConfigMap []*cm
 
 func (this CoreV1ConfigMap) Len() int {
@@ -26,18 +34,30 @@ func (this CoreV1ConfigMap) Swap(i, j int) {
 }
 
 // SecretMap
-type ConfigMapStruct struct {
+type ConfigMapRepo struct {
 	data sync.Map // [ns string] []*v1.Secret
 }
 
-func newcm(c *corev1.ConfigMap) *cm {
-	return &cm{
-		cmdata: c, //原始对象
-		md5:    helpers.Md5Data(c.Data),
+func ProviderConfigMapRepo() *ConfigMapRepo {
+	return &ConfigMapRepo{
+		data: sync.Map{},
 	}
 }
 
-func (this *ConfigMapStruct) Get(ns string, name string) *corev1.ConfigMap {
+func (this *ConfigMapRepo) OnAdd(obj interface{}, isInInitialList bool) {
+	this.Add(obj.(*corev1.ConfigMap))
+}
+func (this *ConfigMapRepo) OnUpdate(oldObj, newObj interface{}) {
+	err := this.Update(newObj.(*corev1.ConfigMap))
+	if err == false {
+		return
+	}
+}
+func (this *ConfigMapRepo) OnDelete(obj interface{}) {
+	this.Delete(obj.(*corev1.ConfigMap))
+}
+
+func (this *ConfigMapRepo) Get(ns string, name string) *corev1.ConfigMap {
 	if items, ok := this.data.Load(ns); ok {
 		for _, item := range items.([]*cm) {
 			if item.cmdata.Name == name {
@@ -47,7 +67,7 @@ func (this *ConfigMapStruct) Get(ns string, name string) *corev1.ConfigMap {
 	}
 	return nil
 }
-func (this *ConfigMapStruct) Add(item *corev1.ConfigMap) {
+func (this *ConfigMapRepo) Add(item *corev1.ConfigMap) {
 	if list, ok := this.data.Load(item.Namespace); ok {
 		list = append(list.([]*cm), newcm(item))
 		this.data.Store(item.Namespace, list)
@@ -57,7 +77,7 @@ func (this *ConfigMapStruct) Add(item *corev1.ConfigMap) {
 }
 
 // 返回值 是true 或false . true代表有值更新了， 否则返回false
-func (this *ConfigMapStruct) Update(item *corev1.ConfigMap) bool {
+func (this *ConfigMapRepo) Update(item *corev1.ConfigMap) bool {
 	if list, ok := this.data.Load(item.Namespace); ok {
 		for i, range_item := range list.([]*cm) {
 			//这里做判断，如果没变化就不做 更新
@@ -69,7 +89,8 @@ func (this *ConfigMapStruct) Update(item *corev1.ConfigMap) bool {
 	}
 	return false
 }
-func (this *ConfigMapStruct) Delete(svc *corev1.ConfigMap) {
+
+func (this *ConfigMapRepo) Delete(svc *corev1.ConfigMap) {
 	if list, ok := this.data.Load(svc.Namespace); ok {
 		for i, range_item := range list.([]*cm) {
 			if range_item.cmdata.Name == svc.Name {
@@ -80,7 +101,7 @@ func (this *ConfigMapStruct) Delete(svc *corev1.ConfigMap) {
 		}
 	}
 }
-func (this *ConfigMapStruct) ListAll(ns string) *result.ErrorResult {
+func (this *ConfigMapRepo) ListAll(ns string) *result.ErrorResult {
 	ret := []*corev1.ConfigMap{}
 	if list, ok := this.data.Load(ns); ok {
 		newList := list.([]*cm)
@@ -91,10 +112,4 @@ func (this *ConfigMapStruct) ListAll(ns string) *result.ErrorResult {
 	}
 	//return ret, nil //返回空列表
 	return result.Result(ret, nil)
-}
-
-var ConfigMapInstance *ConfigMapStruct
-
-func init() {
-	ConfigMapInstance = &ConfigMapStruct{}
 }

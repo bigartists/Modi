@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/bigartists/Modi/config"
 	"github.com/bigartists/Modi/src/controllers"
-	"github.com/bigartists/Modi/src/dao"
 	"github.com/bigartists/Modi/src/model/UserModel"
+	"github.com/bigartists/Modi/src/repo"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"
 
@@ -15,7 +15,15 @@ import (
 	"time"
 )
 
-func JwtAuthMiddleware() gin.HandlerFunc {
+type AuthMiddleware struct {
+	userRepo repo.IUserRepo
+}
+
+func NewAuthMiddleware(userRepo repo.IUserRepo) *AuthMiddleware {
+	return &AuthMiddleware{userRepo: userRepo}
+}
+
+func (this *AuthMiddleware) JwtAuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		path := c.Request.URL.Path
 		// 定义不需要JWT验证的路径
@@ -46,9 +54,9 @@ func JwtAuthMiddleware() gin.HandlerFunc {
 			//fmt.Println(getToken.Claims.(*utils.UserClaim).UserId)
 			userId := getToken.Claims.(*utils.UserClaim).UserId
 
-			// 将userId 转为int， 并调用 dao.DaoGetter.FindUserById
+			// 将userId 转为int， 并调用 repo.DaoGetter.FindUserById
 			user := UserModel.New()
-			_, err := dao.UserGetter.FindUserById(userId, user)
+			_, err := this.userRepo.FindUserById(userId, user)
 			if err != nil {
 				c.JSON(http.StatusUnauthorized, gin.H{"error": "用户不存在"})
 				c.Abort()

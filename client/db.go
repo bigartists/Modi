@@ -1,4 +1,4 @@
-package dao
+package client
 
 import (
 	"github.com/bigartists/Modi/config"
@@ -8,13 +8,7 @@ import (
 	"time"
 )
 
-var Orm *gorm.DB
-
-func InitDB() {
-	Orm = gormDB()
-}
-
-func gormDB() *gorm.DB {
+func ProvideDB() *gorm.DB {
 	dsn := config.SysYamlconfig.Database.Dsn
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
