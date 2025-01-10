@@ -8,6 +8,11 @@ import (
 )
 
 type UserController struct {
+	userService *service.IUserServiceGetterImpl
+}
+
+func NewUserController(userService *service.IUserServiceGetterImpl) *UserController {
+	return &UserController{userService: userService}
 }
 
 func NewUserHandler() *UserController {
@@ -18,22 +23,22 @@ func NewUserHandler() *UserController {
 
 // Build Build方法
 func (this *UserController) Build(r *gin.RouterGroup) {
-	r.GET("/users", UserList)
-	r.GET("/user/:id", UserDetail)
+	r.GET("/users", this.UserList)
+	r.GET("/user/:id", this.UserDetail)
 	r.POST("/test", Test)
 }
 
-func UserList(c *gin.Context) {
-	ret := ResultWrapper(c)(service.UserServiceGetter.GetUserList(), "")(OK)
+func (this *UserController) UserList(c *gin.Context) {
+	ret := ResultWrapper(c)(this.userService.GetUserList(), "")(OK)
 	c.JSON(200, ret)
 }
 
-func UserDetail(c *gin.Context) {
+func (this *UserController) UserDetail(c *gin.Context) {
 	id := &struct {
 		Id int64 `uri:"id" binding:"required"`
 	}{}
 	result.Result(c.ShouldBindUri(id)).Unwrap()
-	ret := ResultWrapper(c)(service.UserServiceGetter.GetUserDetail(id.Id).Unwrap(), "")(OK)
+	ret := ResultWrapper(c)(this.userService.GetUserDetail(id.Id).Unwrap(), "")(OK)
 	c.JSON(200, ret)
 }
 

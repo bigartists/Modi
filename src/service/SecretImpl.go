@@ -3,25 +3,28 @@ package service
 import (
 	"github.com/bigartists/Modi/client"
 	"github.com/bigartists/Modi/src/model/SecretModel"
+	"github.com/bigartists/Modi/src/repo"
 	"github.com/bigartists/Modi/src/result"
+	"github.com/bigartists/Modi/src/utils"
 	"github.com/gin-gonic/gin"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-
-	"github.com/bigartists/Modi/src/utils"
 )
-
-var SecretServiceGetter ISecret
 
 type ISecret interface {
 	GetSecretByNs(ns string) *result.ErrorResult
 	PostSecret(secret *SecretModel.PostSecretModel, c *gin.Context) *result.ErrorResult
 }
 
-type ISecretServiceGetterImpl struct {
+type SecretService struct {
+	secretRepo *repo.SecretRepo
 }
 
-func (I ISecretServiceGetterImpl) PostSecret(secret *SecretModel.PostSecretModel, c *gin.Context) *result.ErrorResult {
+func NewSecretService(secretRepo *repo.SecretRepo) ISecret {
+	return &SecretService{secretRepo: secretRepo}
+}
+
+func (this *SecretService) PostSecret(secret *SecretModel.PostSecretModel, c *gin.Context) *result.ErrorResult {
 	_, err := client.K8sClient.CoreV1().Secrets(secret.Namespace).Create(
 		c,
 		&v1.Secret{
@@ -42,13 +45,13 @@ func (I ISecretServiceGetterImpl) PostSecret(secret *SecretModel.PostSecretModel
 	}
 }
 
-func (I ISecretServiceGetterImpl) GetSecretByNs(ns string) *result.ErrorResult {
+func (this *SecretService) GetSecretByNs(ns string) *result.ErrorResult {
 	var list []*v1.Secret
 
 	if ns == "" {
-		list = SecretMapInstance.ListAll()
+		list = this.secretRepo.ListAll()
 	} else {
-		list = SecretMapInstance.ListAllByNs(ns)
+		list = this.secretRepo.ListAllByNs(ns)
 
 	}
 
@@ -65,8 +68,4 @@ func (I ISecretServiceGetterImpl) GetSecretByNs(ns string) *result.ErrorResult {
 	}
 
 	return result.Result(ret, nil)
-}
-
-func init() {
-	SecretServiceGetter = &ISecretServiceGetterImpl{}
 }

@@ -1,4 +1,4 @@
-package service
+package repo
 
 import (
 	"fmt"
@@ -20,13 +20,27 @@ func (this CoreV1Secret) Swap(i, j int) {
 	this[i], this[j] = this[j], this[i]
 }
 
-// SecretMap
-type SecretMapStruct struct {
-	data sync.Map // [ns string] []*v1.Secret
+type SecretRepo struct {
+	secretMap sync.Map // [ns string] []*v1.Secret
 }
 
-func (this *SecretMapStruct) Get(ns string, name string) *corev1.Secret {
-	if items, ok := this.data.Load(ns); ok {
+func (this *SecretRepo) OnAdd(obj interface{}, isInInitialList bool) {
+	this.Add(obj.(*corev1.Secret))
+}
+
+func (this *SecretRepo) OnUpdate(oldObj, newObj interface{}) {
+	err := this.Update(newObj.(*corev1.Secret))
+	if err != nil {
+		return
+	}
+}
+
+func (this *SecretRepo) OnDelete(obj interface{}) {
+	this.Delete(obj.(*corev1.Secret))
+}
+
+func (this *SecretRepo) Get(ns string, name string) *corev1.Secret {
+	if items, ok := this.secretMap.Load(ns); ok {
 		for _, item := range items.([]*corev1.Secret) {
 			if item.Name == name {
 				return item
@@ -35,16 +49,16 @@ func (this *SecretMapStruct) Get(ns string, name string) *corev1.Secret {
 	}
 	return nil
 }
-func (this *SecretMapStruct) Add(item *corev1.Secret) {
-	if list, ok := this.data.Load(item.Namespace); ok {
+func (this *SecretRepo) Add(item *corev1.Secret) {
+	if list, ok := this.secretMap.Load(item.Namespace); ok {
 		list = append(list.([]*corev1.Secret), item)
-		this.data.Store(item.Namespace, list)
+		this.secretMap.Store(item.Namespace, list)
 	} else {
-		this.data.Store(item.Namespace, []*corev1.Secret{item})
+		this.secretMap.Store(item.Namespace, []*corev1.Secret{item})
 	}
 }
-func (this *SecretMapStruct) Update(item *corev1.Secret) error {
-	if list, ok := this.data.Load(item.Namespace); ok {
+func (this *SecretRepo) Update(item *corev1.Secret) error {
+	if list, ok := this.secretMap.Load(item.Namespace); ok {
 		for i, range_item := range list.([]*corev1.Secret) {
 			if range_item.Name == item.Name {
 				list.([]*corev1.Secret)[i] = item
@@ -54,19 +68,19 @@ func (this *SecretMapStruct) Update(item *corev1.Secret) error {
 	}
 	return fmt.Errorf("Secret-%s not found", item.Name)
 }
-func (this *SecretMapStruct) Delete(svc *corev1.Secret) {
-	if list, ok := this.data.Load(svc.Namespace); ok {
+func (this *SecretRepo) Delete(svc *corev1.Secret) {
+	if list, ok := this.secretMap.Load(svc.Namespace); ok {
 		for i, range_item := range list.([]*corev1.Secret) {
 			if range_item.Name == svc.Name {
 				newList := append(list.([]*corev1.Secret)[:i], list.([]*corev1.Secret)[i+1:]...)
-				this.data.Store(svc.Namespace, newList)
+				this.secretMap.Store(svc.Namespace, newList)
 				break
 			}
 		}
 	}
 }
-func (this *SecretMapStruct) ListAllByNs(ns string) []*corev1.Secret {
-	if list, ok := this.data.Load(ns); ok {
+func (this *SecretRepo) ListAllByNs(ns string) []*corev1.Secret {
+	if list, ok := this.secretMap.Load(ns); ok {
 		newList := list.([]*corev1.Secret)
 		sort.Sort(CoreV1Secret(newList)) //  按时间倒排序
 
@@ -75,9 +89,9 @@ func (this *SecretMapStruct) ListAllByNs(ns string) []*corev1.Secret {
 	return []*corev1.Secret{} //返回空列表
 }
 
-func (this *SecretMapStruct) ListAll() []*corev1.Secret {
+func (this *SecretRepo) ListAll() []*corev1.Secret {
 	var ret []*corev1.Secret
-	this.data.Range(func(key, value interface{}) bool {
+	this.secretMap.Range(func(key, value interface{}) bool {
 		for _, item := range value.([]*corev1.Secret) {
 			ret = append(ret, item)
 		}
@@ -85,11 +99,10 @@ func (this *SecretMapStruct) ListAll() []*corev1.Secret {
 	})
 	sort.Sort(CoreV1Secret(ret)) //  按时间倒排序
 	return ret
-
 }
 
-var SecretMapInstance *SecretMapStruct
-
-func init() {
-	SecretMapInstance = &SecretMapStruct{}
+func ProvideSecretRepo() *SecretRepo {
+	return &SecretRepo{
+		secretMap: sync.Map{},
+	}
 }

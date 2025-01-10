@@ -9,32 +9,34 @@ import (
 )
 
 type SecretController struct {
+	//secretService *service.SecretService
+	secretService service.ISecret
 }
 
-func NewSecretController() *SecretController {
-	return &SecretController{}
+func NewSecretController(secretService service.ISecret) *SecretController {
+	return &SecretController{secretService: secretService}
 }
 
 func (this *SecretController) Build(r *gin.RouterGroup) {
-	r.GET("/secret", secretList)
-	r.POST("/secret", postSecret)
+	r.GET("/secret", this.secretList)
+	r.POST("/secret", this.postSecret)
 	//r.GET("/secret", secretDetail)
 	//r.POST("/secret/update", updateSecret)
 	//r.DELETE("/secret", deleteSecret)
 }
 
-func secretList(c *gin.Context) {
+func (this *SecretController) secretList(c *gin.Context) {
 	namespace := &struct {
 		Namespace string `form:"ns"`
 	}{}
 	result.Result(c.ShouldBindQuery(namespace)).Unwrap()
-	ret := ResultWrapper(c)(service.SecretServiceGetter.GetSecretByNs(namespace.Namespace).Unwrap(), "")(OK)
+	ret := ResultWrapper(c)(this.secretService.GetSecretByNs(namespace.Namespace).Unwrap(), "")(OK)
 	c.JSON(http.StatusOK, ret)
 }
 
-func postSecret(c *gin.Context) {
+func (this *SecretController) postSecret(c *gin.Context) {
 	postModel := &Model.PostSecretModel{}
 	result.Result(c.ShouldBindJSON(postModel))
-	ret := ResultWrapper(c)(service.SecretServiceGetter.PostSecret(postModel, c).Unwrap(), "")(OK)
+	ret := ResultWrapper(c)(this.secretService.PostSecret(postModel, c).Unwrap(), "")(OK)
 	c.JSON(http.StatusOK, ret)
 }
