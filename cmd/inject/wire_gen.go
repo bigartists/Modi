@@ -22,7 +22,12 @@ import (
 func InitializeApp() (*server.App, error) {
 	secretRepo := repo.ProvideSecretRepo()
 	configMapRepo := repo.ProviderConfigMapRepo()
-	informerManager := informer.NewInformerManager(secretRepo, configMapRepo)
+	eventRepo := repo.ProviderEventRepo()
+	namespaceRepo := repo.ProviderNamespaceRepo()
+	rsRep := repo.ProviderRsRep()
+	deploymentRepo := repo.ProviderDeploymentRepo()
+	podRepo := repo.ProviderPodRepo()
+	informerManager := informer.NewInformerManager(secretRepo, configMapRepo, eventRepo, namespaceRepo, rsRep, deploymentRepo, podRepo)
 	db := client.ProvideDB()
 	iUserRepo := repo.NewIUserGetterImpl(db)
 	authMiddleware := middlewares.NewAuthMiddleware(iUserRepo)
@@ -31,8 +36,13 @@ func InitializeApp() (*server.App, error) {
 	authController := controllers.NewAuthController(iUserServiceGetterImpl)
 	iSecret := service.NewSecretService(secretRepo)
 	secretController := controllers.NewSecretController(iSecret)
-	configMapController := controllers.NewConfigMapController(configMapRepo)
-	engine, err := routes.ProvideRouter(informerManager, authMiddleware, errorHandlerMiddleware, authController, secretController, configMapController)
+	configmapService := service.ProviderConfigmapService(configMapRepo)
+	configMapController := controllers.NewConfigMapController(configmapService)
+	podService := service.ProviderPodService(podRepo)
+	deploymentService := service.ProviderDeploymentService(rsRep, podRepo, deploymentRepo, namespaceRepo, podService)
+	deploymentController := controllers.ProviderDeploymentController(deploymentService)
+	userController := controllers.ProviderUserController(iUserServiceGetterImpl)
+	engine, err := routes.ProvideRouter(informerManager, authMiddleware, errorHandlerMiddleware, authController, secretController, configMapController, deploymentController, userController)
 	if err != nil {
 		return nil, err
 	}

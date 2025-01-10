@@ -1,17 +1,39 @@
-package service
+package repo
 
 import (
 	"fmt"
 	corev1 "k8s.io/api/core/v1"
+	"log"
 	"sync"
 )
 
 // 根据基本知识点，要实现自定义排序，需要实现sort.Interface接口的三个方法：Len()、Less()、Swap()；
-type PodMapStruct struct {
+type PodRepo struct {
 	data sync.Map
 }
 
-func (this *PodMapStruct) Add(pod *corev1.Pod) {
+func ProviderPodRepo() *PodRepo {
+	return &PodRepo{data: sync.Map{}}
+}
+
+func (this *PodRepo) OnAdd(obj interface{}, isInInitialList bool) {
+	this.Add(obj.(*corev1.Pod))
+}
+
+func (this *PodRepo) OnUpdate(oldObj, newObj interface{}) {
+	err := this.Update(newObj.(*corev1.Pod))
+	if err != nil {
+		log.Println(err)
+	}
+}
+
+func (this *PodRepo) OnDelete(obj interface{}) {
+	if d, ok := obj.(*corev1.Pod); ok {
+		this.data.Delete(d)
+	}
+}
+
+func (this *PodRepo) Add(pod *corev1.Pod) {
 	if list, ok := this.data.Load(pod.Namespace); ok {
 		list = append(list.([]*corev1.Pod), pod)
 		this.data.Store(pod.Namespace, list)
@@ -20,7 +42,7 @@ func (this *PodMapStruct) Add(pod *corev1.Pod) {
 	}
 }
 
-func (this *PodMapStruct) Get(ns string, podName string) *corev1.Pod {
+func (this *PodRepo) Get(ns string, podName string) *corev1.Pod {
 	if list, ok := this.data.Load(ns); ok {
 		for _, pod := range list.([]*corev1.Pod) {
 			if pod.Name == podName {
@@ -31,7 +53,7 @@ func (this *PodMapStruct) Get(ns string, podName string) *corev1.Pod {
 	return nil
 }
 
-func (this *PodMapStruct) Update(pod *corev1.Pod) error {
+func (this *PodRepo) Update(pod *corev1.Pod) error {
 	if list, ok := this.data.Load(pod.Namespace); ok {
 		for i, range_pod := range list.([]*corev1.Pod) {
 			if range_pod.Name == pod.Name {
@@ -43,7 +65,7 @@ func (this *PodMapStruct) Update(pod *corev1.Pod) error {
 	return fmt.Errorf("Pod-%s not found", pod.Name)
 }
 
-func (this *PodMapStruct) Delete(pod *corev1.Pod) {
+func (this *PodRepo) Delete(pod *corev1.Pod) {
 	if list, ok := this.data.Load(pod.Namespace); ok {
 		for i, range_pod := range list.([]*corev1.Pod) {
 			if range_pod.Name == pod.Name {
@@ -55,7 +77,7 @@ func (this *PodMapStruct) Delete(pod *corev1.Pod) {
 	}
 }
 
-//func (this *PodMapStruct) ListByLabel(ns string, labels map[string]string) ([]*corev1.Pod, error) {
+//func (this *PodRepo) ListByLabel(ns string, labels map[string]string) ([]*corev1.Pod, error) {
 //	ret := make([]*corev1.Pod, 0)
 //	if list, ok := this.data.Load(ns); ok {
 //		for _, pod := range list.([]*corev1.Pod) {
@@ -68,7 +90,7 @@ func (this *PodMapStruct) Delete(pod *corev1.Pod) {
 //	return nil, fmt.Errorf("ListByLabel record not found")
 //}
 
-func (this *PodMapStruct) ListByLabel(ns string, labels []map[string]string) ([]*corev1.Pod, error) {
+func (this *PodRepo) ListByLabel(ns string, labels []map[string]string) ([]*corev1.Pod, error) {
 	fmt.Println("ns=", ns, "labels=", labels)
 	ret := make([]*corev1.Pod, 0)
 	if list, ok := this.data.Load(ns); ok {
@@ -105,7 +127,7 @@ func (this *PodMapStruct) ListByLabel(ns string, labels []map[string]string) ([]
 	return nil, fmt.Errorf("pods not found ")
 }
 
-func (this *PodMapStruct) GetAllPods() ([]*corev1.Pod, error) {
+func (this *PodRepo) GetAllPods() ([]*corev1.Pod, error) {
 	var lists []*corev1.Pod
 	this.data.Range(func(key, value any) bool {
 		lists = append(lists, value.([]*corev1.Pod)...)
@@ -119,7 +141,7 @@ func (this *PodMapStruct) GetAllPods() ([]*corev1.Pod, error) {
 	return lists, nil
 }
 
-func (this *PodMapStruct) GetDetail(ns string, podName string) (*corev1.Pod, error) {
+func (this *PodRepo) GetDetail(ns string, podName string) (*corev1.Pod, error) {
 	if list, ok := this.data.Load(ns); ok {
 		for _, pod := range list.([]*corev1.Pod) {
 			if pod.Name == podName {
@@ -128,10 +150,4 @@ func (this *PodMapStruct) GetDetail(ns string, podName string) (*corev1.Pod, err
 		}
 	}
 	return nil, fmt.Errorf("poddetail: record not found")
-}
-
-var PodMapInstance *PodMapStruct
-
-func init() {
-	PodMapInstance = &PodMapStruct{}
 }

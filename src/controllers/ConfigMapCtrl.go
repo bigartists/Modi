@@ -1,18 +1,18 @@
 package controllers
 
 import (
-	"github.com/bigartists/Modi/src/repo"
 	"github.com/bigartists/Modi/src/result"
+	"github.com/bigartists/Modi/src/service"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
 
 type ConfigMapController struct {
-	configmapRepo *repo.ConfigMapRepo
+	configService *service.ConfigmapService
 }
 
-func NewConfigMapController(configmapRepo *repo.ConfigMapRepo) *ConfigMapController {
-	return &ConfigMapController{configmapRepo: configmapRepo}
+func NewConfigMapController(configService *service.ConfigmapService) *ConfigMapController {
+	return &ConfigMapController{configService: configService}
 }
 
 func (this *ConfigMapController) Build(r *gin.RouterGroup) {
@@ -24,6 +24,6 @@ func (this *ConfigMapController) ListAll(c *gin.Context) {
 		Namespace string `form:"ns"`
 	}{}
 	result.Result(c.ShouldBindQuery(namespace)).Unwrap()
-	ret := ResultWrapper(c)(this.configmapRepo.ListAll(namespace.Namespace).Unwrap(), "")(OK)
+	ret := ResultWrapper(c)(this.configService.GetAll(namespace.Namespace).Unwrap(), "")(OK)
 	c.JSON(http.StatusOK, ret)
 }
