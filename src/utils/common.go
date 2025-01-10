@@ -1,4 +1,4 @@
-package service
+package utils
 
 import (
 	v1 "k8s.io/api/apps/v1"
@@ -9,15 +9,15 @@ import (
 type MapItems []*MapItem
 
 type MapItem struct {
-	key   string
+	Key   string
 	value interface{}
 }
 
 // 把sync.map 转为自定义切片
-func convertToMapItems(m sync.Map) MapItems {
+func ConvertToMapItems(m sync.Map) MapItems {
 	items := make(MapItems, 0)
 	m.Range(func(key, value interface{}) bool {
-		items = append(items, &MapItem{key: key.(string), value: value})
+		items = append(items, &MapItem{Key: key.(string), value: value})
 		return true
 	})
 	return items
@@ -28,7 +28,7 @@ func (this MapItems) Len() int {
 }
 
 func (this MapItems) Less(i, j int) bool {
-	return this[i].key < this[j].key
+	return this[i].Key < this[j].Key
 }
 
 func (this MapItems) Swap(i, j int) {

@@ -16,6 +16,8 @@ func ProvideRouter(
 	authController *controllers.AuthController,
 	secretController *controllers.SecretController,
 	configmapController *controllers.ConfigMapController,
+	deployController *controllers.DeploymentController,
+	userController *controllers.UserController,
 ) (*gin.Engine, error) {
 	//r := gin.Default()
 	r := gin.Default()
@@ -34,7 +36,7 @@ func ProvideRouter(
 	authController.Build(api)
 	secretController.Build(api)
 	configmapController.Build(api)
-	controllers.NewUserHandler().Build(api)
-	controllers.NewDeploymentHandler().Build(api)
+	deployController.Build(api)
+	userController.Build(api)
 	return r, nil
 }

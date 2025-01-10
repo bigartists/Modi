@@ -1,4 +1,4 @@
-package service
+package repo
 
 import (
 	"fmt"
@@ -6,11 +6,30 @@ import (
 	"sync"
 )
 
-type DeploymentMap struct {
+type DeploymentRepo struct {
 	data sync.Map
 }
 
-func (this *DeploymentMap) Add(deployment *v1.Deployment) {
+func ProviderDeploymentRepo() *DeploymentRepo {
+	return &DeploymentRepo{data: sync.Map{}}
+}
+
+func (this *DeploymentRepo) OnAdd(obj interface{}, isInInitialList bool) {
+	this.Add(obj.(*v1.Deployment))
+}
+
+func (this *DeploymentRepo) OnUpdate(oldObj, newObj interface{}) {
+	err := this.Update(newObj.(*v1.Deployment))
+	if err != nil {
+		return
+	}
+}
+
+func (this *DeploymentRepo) OnDelete(obj interface{}) {
+	this.Delete(obj.(*v1.Deployment))
+}
+
+func (this *DeploymentRepo) Add(deployment *v1.Deployment) {
 	ns := deployment.Namespace
 	if list, ok := this.data.Load(ns); ok {
 		list = append(list.([]*v1.Deployment), deployment)
@@ -20,7 +39,7 @@ func (this *DeploymentMap) Add(deployment *v1.Deployment) {
 	}
 }
 
-func (this *DeploymentMap) Update(deployment *v1.Deployment) error {
+func (this *DeploymentRepo) Update(deployment *v1.Deployment) error {
 	ns := deployment.Namespace
 	if list, ok := this.data.Load(ns); ok {
 		for item, rangeDep := range list.([]*v1.Deployment) {
@@ -33,7 +52,7 @@ func (this *DeploymentMap) Update(deployment *v1.Deployment) error {
 	return fmt.Errorf("deployment-%s not found", deployment.Name)
 }
 
-func (this *DeploymentMap) Delete(deployment *v1.Deployment) {
+func (this *DeploymentRepo) Delete(deployment *v1.Deployment) {
 	ns := deployment.Namespace
 	if list, ok := this.data.Load(ns); ok {
 		for item, rangeDep := range list.([]*v1.Deployment) {
@@ -51,7 +70,7 @@ func (this *DeploymentMap) Delete(deployment *v1.Deployment) {
 	}
 }
 
-func (this *DeploymentMap) GetDeploymentsByNs(ns string) ([]*v1.Deployment, error) {
+func (this *DeploymentRepo) GetDeploymentsByNs(ns string) ([]*v1.Deployment, error) {
 	if list, ok := this.data.Load(ns); ok {
 		//return list.([]*v1.Deployment), nil
 		return list.([]*v1.Deployment), nil
@@ -61,7 +80,7 @@ func (this *DeploymentMap) GetDeploymentsByNs(ns string) ([]*v1.Deployment, erro
 	}
 }
 
-func (this *DeploymentMap) GetAllDeployment() ([]*v1.Deployment, error) {
+func (this *DeploymentRepo) GetAllDeployment() ([]*v1.Deployment, error) {
 	var lists []*v1.Deployment
 	this.data.Range(func(key, value any) bool {
 		lists = append(lists, value.([]*v1.Deployment)...)
@@ -75,7 +94,7 @@ func (this *DeploymentMap) GetAllDeployment() ([]*v1.Deployment, error) {
 	return lists, nil
 }
 
-func (this *DeploymentMap) GetDeploymentByName(ns string, name string) (*v1.Deployment, error) {
+func (this *DeploymentRepo) GetDeploymentByName(ns string, name string) (*v1.Deployment, error) {
 	if list, ok := this.data.Load(ns); ok {
 		for _, dep := range list.([]*v1.Deployment) {
 			if dep.Name == name {
@@ -84,10 +103,4 @@ func (this *DeploymentMap) GetDeploymentByName(ns string, name string) (*v1.Depl
 		}
 	}
 	return nil, fmt.Errorf("GetDeployment: record not found")
-}
-
-var DeploymentMapInstance *DeploymentMap
-
-func init() {
-	DeploymentMapInstance = &DeploymentMap{}
 }

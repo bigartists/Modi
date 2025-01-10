@@ -13,35 +13,36 @@ import (
 )
 
 type DeploymentController struct {
+	deploymentService *service.DeploymentService
 }
 
-func NewDeploymentHandler() *DeploymentController {
-	return &DeploymentController{}
+func ProviderDeploymentController(deploymentService *service.DeploymentService) *DeploymentController {
+	return &DeploymentController{deploymentService: deploymentService}
 }
 
 func (this *DeploymentController) Build(r *gin.RouterGroup) {
 	//r.GET("/deployments", deploymentList) // /modi/v1/deployments?ns=infra
-	r.GET("/deployments", deploymentList2) // /modi/v1/deployments?ns=infra
-	r.GET("/deployment", deploymentDetail)
-	r.POST("/deployment/update/scale", incrReplicas)
-	r.GET("/pod/json", podJson)
-	r.GET("/pods", pods)
-	r.GET("/pod", podDetail)
-	r.DELETE("/pod", deletePod)
-	r.GET("/ns", namespaces)
-	r.GET("/pod/logs", podLogs)
-	r.POST("/pod/log/stream", streamLogs)
-	r.GET("/pod/containers", GetPodContainer)
+	r.GET("/deployments", this.deploymentList2) // /modi/v1/deployments?ns=infra
+	r.GET("/deployment", this.deploymentDetail)
+	r.POST("/deployment/update/scale", this.incrReplicas)
+	r.GET("/pod/json", this.podJson)
+	r.GET("/pods", this.pods)
+	r.GET("/pod", this.podDetail)
+	r.DELETE("/pod", this.deletePod)
+	r.GET("/ns", this.namespaces)
+	r.GET("/pod/logs", this.podLogs)
+	r.POST("/pod/log/stream", this.streamLogs)
+	r.GET("/pod/containers", this.GetPodContainer)
 }
 
-func namespaces(c *gin.Context) {
+func (this *DeploymentController) namespaces(c *gin.Context) {
 	//ResultWrapper(c)(service.DeploymentServiceGetter.GetNs().Unwrap(), "")(OK)
 
-	ret := ResultWrapper(c)(service.DeploymentServiceGetter.GetNs().Unwrap(), "")(OK)
+	ret := ResultWrapper(c)(this.deploymentService.GetNs().Unwrap(), "")(OK)
 	c.JSON(http.StatusOK, ret)
 }
 
-func streamLogs(c *gin.Context) {
+func (this *DeploymentController) streamLogs(c *gin.Context) {
 
 	params := &struct {
 		Namespace string `json:"ns"  required:"true"`
@@ -100,105 +101,105 @@ func streamLogs(c *gin.Context) {
 
 }
 
-func podLogs(c *gin.Context) {
+func (this *DeploymentController) podLogs(c *gin.Context) {
 	req := &struct {
 		Namespace string `form:"ns" binding:"required"`
 		Pod       string `form:"pname" binding:"required"`
 		Container string `form:"cname" binding:"required"`
 	}{}
 	result.Result(c.ShouldBindQuery(req)).Unwrap()
-	ret := ResultWrapper(c)(service.DeploymentServiceGetter.GetPodLogs(c, req.Namespace, req.Pod, req.Container).Unwrap(), "")(OK)
+	ret := ResultWrapper(c)(this.deploymentService.GetPodLogs(c, req.Namespace, req.Pod, req.Container).Unwrap(), "")(OK)
 	c.JSON(http.StatusOK, ret)
 }
 
-func GetPodContainer(c *gin.Context) {
+func (this *DeploymentController) GetPodContainer(c *gin.Context) {
 	req := &struct {
 		Namespace string `form:"ns" binding:"required"`
 		Pod       string `form:"pname" binding:"required"`
 	}{}
 	result.Result(c.ShouldBindQuery(req)).Unwrap()
-	ret := ResultWrapper(c)(service.DeploymentServiceGetter.GetPodContainer(req.Namespace, req.Pod).Unwrap(), "")(OK)
+	ret := ResultWrapper(c)(this.deploymentService.GetPodContainer(req.Namespace, req.Pod).Unwrap(), "")(OK)
 	c.JSON(http.StatusOK, ret)
 }
 
-func deletePod(c *gin.Context) {
+func (this *DeploymentController) deletePod(c *gin.Context) {
 	req := &struct {
 		Namespace string `form:"ns" binding:"required"`
 		Pod       string `form:"pod" binding:"required"`
 	}{}
 	result.Result(c.ShouldBindQuery(req)).Unwrap()
-	ret := ResultWrapper(c)(service.DeploymentServiceGetter.DeletePod(req.Namespace, req.Pod).Unwrap(), "")(OK)
+	ret := ResultWrapper(c)(this.deploymentService.DeletePod(req.Namespace, req.Pod).Unwrap(), "")(OK)
 	c.JSON(http.StatusOK, ret)
 }
 
-func podJson(c *gin.Context) {
+func (this *DeploymentController) podJson(c *gin.Context) {
 	req := &struct {
 		Namespace string `form:"ns" binding:"required"`
 		Pod       string `form:"pod" binding:"required"`
 	}{}
 	result.Result(c.ShouldBindQuery(req)).Unwrap()
 	//ResultWrapper(c)(service.DeploymentServiceGetter.GetPodJson(req.Namespace, req.Pod).Unwrap(), "")(OK)
-	ret := ResultWrapper(c)(service.DeploymentServiceGetter.GetPodJson(req.Namespace, req.Pod).Unwrap(), "")(OK)
+	ret := ResultWrapper(c)(this.deploymentService.GetPodJson(req.Namespace, req.Pod).Unwrap(), "")(OK)
 	c.JSON(http.StatusOK, ret)
 }
 
-func deploymentList(c *gin.Context) {
+func (this *DeploymentController) deploymentList(c *gin.Context) {
 	namespace := &struct {
 		Namespace string `form:"ns"`
 	}{}
 	result.Result(c.ShouldBindQuery(namespace)).Unwrap()
-	ret := ResultWrapper(c)(service.DeploymentServiceGetter.GetDeploymentsByNs(namespace.Namespace).Unwrap(), "")(OK)
+	ret := ResultWrapper(c)(this.deploymentService.GetDeploymentsByNs(namespace.Namespace).Unwrap(), "")(OK)
 	c.JSON(http.StatusOK, ret)
 }
 
-func deploymentList2(c *gin.Context) {
+func (this *DeploymentController) deploymentList2(c *gin.Context) {
 	namespace := &struct {
 		Namespace string `form:"ns"`
 	}{}
 	if handler.BindAndCheck(c, namespace) {
 		return
 	}
-	ret, err := service.DeploymentServiceGetter.GetDeploymentsByNs2(namespace.Namespace)
+	ret, err := this.deploymentService.GetDeploymentsByNs2(namespace.Namespace)
 	handler.HandleResponse(c, err, ret)
 }
 
-func pods(c *gin.Context) {
+func (this *DeploymentController) pods(c *gin.Context) {
 	req := &struct {
 		Namespace  string `form:"ns"`
 		Deployment string `form:"deployment"`
 	}{}
 	result.Result(c.ShouldBindQuery(req)).Unwrap()
-	ret := ResultWrapper(c)(service.DeploymentServiceGetter.GetPods(req.Namespace, req.Deployment).Unwrap(), "")(OK)
+	ret := ResultWrapper(c)(this.deploymentService.GetPods(req.Namespace, req.Deployment).Unwrap(), "")(OK)
 	c.JSON(http.StatusOK, ret)
 }
 
-func podDetail(c *gin.Context) {
+func (this *DeploymentController) podDetail(c *gin.Context) {
 	req := &struct {
 		Namespace string `form:"ns" binding:"required"`
 		Pod       string `form:"pod" binding:"required"`
 	}{}
 	result.Result(c.ShouldBindQuery(req)).Unwrap()
-	ret := ResultWrapper(c)(service.DeploymentServiceGetter.GetPodDetail(req.Namespace, req.Pod).Unwrap(), "")(OK)
+	ret := ResultWrapper(c)(this.deploymentService.GetPodDetail(req.Namespace, req.Pod).Unwrap(), "")(OK)
 	c.JSON(http.StatusOK, ret)
 }
 
-func deploymentDetail(c *gin.Context) {
+func (this *DeploymentController) deploymentDetail(c *gin.Context) {
 	req := &struct {
 		Namespace  string `form:"ns" binding:"required"`
 		Deployment string `form:"deployment" binding:"required"`
 	}{}
 	result.Result(c.ShouldBindQuery(req)).Unwrap()
-	ret := ResultWrapper(c)(service.DeploymentServiceGetter.GetDeploymentDetailByNsDName(req.Namespace, req.Deployment).Unwrap(), "")(OK)
+	ret := ResultWrapper(c)(this.deploymentService.GetDeploymentDetailByNsDName(req.Namespace, req.Deployment).Unwrap(), "")(OK)
 	c.JSON(http.StatusOK, ret)
 }
 
-func incrReplicas(c *gin.Context) {
+func (this *DeploymentController) incrReplicas(c *gin.Context) {
 	req := &struct {
 		Namespace  string `json:"ns" binding:"required,min=1"`
 		Deployment string `json:"deployment" binding:"required,min=1"`
 		Dec        bool   `json:"dec"` //是否减少一个副本
 	}{}
 	result.Result(c.ShouldBindJSON(req)).Unwrap()
-	ret := ResultWrapper(c)(service.DeploymentServiceGetter.IncrReplicas(req.Namespace, req.Deployment, req.Dec), "")(OK)
+	ret := ResultWrapper(c)(this.deploymentService.IncrReplicas(req.Namespace, req.Deployment, req.Dec), "")(OK)
 	c.JSON(http.StatusOK, ret)
 }

@@ -11,12 +11,8 @@ type UserController struct {
 	userService *service.IUserServiceGetterImpl
 }
 
-func NewUserController(userService *service.IUserServiceGetterImpl) *UserController {
+func ProviderUserController(userService *service.IUserServiceGetterImpl) *UserController {
 	return &UserController{userService: userService}
-}
-
-func NewUserHandler() *UserController {
-	return &UserController{}
 }
 
 // GET /users/123
